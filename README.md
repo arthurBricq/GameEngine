@@ -13,3 +13,9 @@ A basic camera model consists of
 
 * Projective transformation is any mapping of points that preserves straight lines
 * A camera is a mapping between the 3D world (image space) and a 2D image: a matrix
+
+### Projection from world coordinate to camera coordinates
+
+Let a point $x = [x,y,z]$ expressed in the world coordinate. The homogenous transformation $T$ such that the same point is expressed in camera coordinates $X = [X,Y,Z]$ is given by $X' = T x'$ (where $x'$ denotes the homogeneous coordinates), and $T = [R, t]$.
+
+To express the rotation matrix $R$, one can simply write $R = [r1, r2, r3]$ where $r_i$ is the world's i-th axis expressed in camera coordinates.
