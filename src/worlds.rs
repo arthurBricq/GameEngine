@@ -1,6 +1,5 @@
 use crate::drawable::Drawable;
 use crate::primitives::cube::Cube3;
-use crate::primitives::point::Point3;
 use crate::primitives::position::Position;
 use crate::primitives::vector::Vector3;
 
@@ -16,7 +15,7 @@ impl World {
         Self {
             objects: Vec::new(),
             camera: Position::new(
-                Point3::new(0.0, 0.0, 0.0),
+                Vector3::new(0.0, 0.0, 0.0),
                 Vector3::empty()
             )
         }

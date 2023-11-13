@@ -1,6 +1,5 @@
 use crate::primitives::cubic_face::CubicFace3;
 use crate::primitives::line::Line;
-use crate::primitives::point::Point3;
 use crate::primitives::position::Position;
 use crate::primitives::vector::Vector3;
 
@@ -17,11 +16,14 @@ impl Cube3 {
     pub fn from_face(bottom: CubicFace3, h: f32) -> Self {
         // Construct the 4 points of the upper face
         let points = bottom.points();
+
+        // It should be noted that the following lines perform a lot of computation
+        // each + creates 2 copies. Maybe we want to do something lighter.
         let extrusion_vec = Vector3::new(0.0, 0.0, h);
-        let p0 = points[0].add(&extrusion_vec);
-        let p1 = points[1].add(&extrusion_vec);
-        let p2 = points[2].add(&extrusion_vec);
-        let p3 = points[3].add(&extrusion_vec);
+        let p0 = points[0] + extrusion_vec;
+        let p1 = points[1] + extrusion_vec;
+        let p2 = points[2] + extrusion_vec;
+        let p3 = points[3] + extrusion_vec;
 
         // Construct the missing faces
         let n = bottom.normal();

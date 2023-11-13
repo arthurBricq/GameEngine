@@ -1,5 +1,9 @@
 use std::ops::{Add, Sub};
 
+/// A vector in 3 coordinates
+///
+/// Mathematically, it can represent equally a 3d vector or a 3d point
+#[derive(Clone, Copy)]
 pub struct Vector3 {
     x: f32,
     y: f32,

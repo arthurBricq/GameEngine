@@ -12,7 +12,6 @@ use crate::boxy_world::BoxyWorld;
 use crate::drawable::Drawable;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face::CubicFace3;
-use crate::primitives::point::Point3;
 use crate::primitives::position::Position;
 use crate::primitives::vector::Vector3;
 
@@ -48,8 +47,8 @@ fn main() -> Result<(), Error> {
     /// Create a world with 1 object
     let mut world = World::new();
     let bottom_face = CubicFace3::from_line(
-        Point3::new(0.0, 0.0, 0.0),
-        Point3::new(1.0, 0.0, 0.0),
+        Vector3::new(0.0, 0.0, 0.0),
+        Vector3::new(1.0, 0.0, 0.0),
         false
     );
     let cube = Cube3::from_face(bottom_face, 2.0);
@@ -57,7 +56,7 @@ fn main() -> Result<(), Error> {
 
     /// Sets the camera as looking at the object
     world.set_camera(Position::new(
-        Point3::new(-2.0, 0.0, 0.0),
+        Vector3::new(-2.0, 0.0, 0.0),
         Vector3::new(1.0, 0.0, 0.0)
     ));
 

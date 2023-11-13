@@ -1,13 +1,12 @@
-use crate::primitives::point::Point3;
 use crate::primitives::vector::Vector3;
 
 pub struct Position {
-    pos: Point3,
+    pos: Vector3,
     orientation: Vector3,
 }
 
 impl Position {
-    pub fn position(&self) -> &Point3 {
+    pub fn position(&self) -> &Vector3 {
         &self.pos
     }
 
@@ -15,7 +14,7 @@ impl Position {
         &self.orientation
     }
 
-    pub fn new(pos: Point3, orientation: Vector3) -> Self {
+    pub fn new(pos: Vector3, orientation: Vector3) -> Self {
         Self { pos, orientation }
     }
 }
