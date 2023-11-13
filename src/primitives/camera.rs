@@ -28,7 +28,7 @@ impl Camera {
 }
 
 impl Camera {
-    fn transformation_to_camera(&self) {
+    fn transformation_to_camera(&self) -> {
 
     }
 }
