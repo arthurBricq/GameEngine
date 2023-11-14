@@ -16,7 +16,7 @@ impl World {
             objects: Vec::new(),
             camera: Position::new(
                 Vector3::new(0.0, 0.0, 0.0),
-                Vector3::empty()
+                0.0
             )
         }
     }
@@ -36,7 +36,7 @@ impl Drawable for World {
     fn draw(&self, _frame: &mut [u8]) {
         for object in &self.objects {
             // Get the lines
-            let faces = object.get_visible_faces(&self.camera);
+            let _faces = object.get_visible_faces(&self.camera);
 
             // Project each line in 2D
         }

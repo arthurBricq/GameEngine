@@ -1,12 +1,12 @@
 
 use pixels::{Error, Pixels, SurfaceTexture};
-use pixels::wgpu::TextureViewDimension::Cube;
+
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
-use crate::boxy_world::BoxyWorld;
+
 
 
 use crate::drawable::Drawable;
@@ -44,7 +44,7 @@ fn main() -> Result<(), Error> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
 
-    /// Create a world with 1 object
+    // Create a world with 1 object
     let mut world = World::new();
     let bottom_face = CubicFace3::from_line(
         Vector3::new(0.0, 0.0, 0.0),
@@ -54,10 +54,10 @@ fn main() -> Result<(), Error> {
     let cube = Cube3::from_face(bottom_face, 2.0);
     world.add_object(cube);
 
-    /// Sets the camera as looking at the object
+    // Sets the camera as looking at the object
     world.set_camera(Position::new(
         Vector3::new(-2.0, 0.0, 0.0),
-        Vector3::new(1.0, 0.0, 0.0)
+        0.0
     ));
 
     // Parse the world as drawable and start the UI loop

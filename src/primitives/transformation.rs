@@ -1,16 +1,19 @@
+use crate::primitives::matrix3::Matrix3;
+use crate::primitives::vector::Vector3;
+
 /// Represent an homogenous transformation of the 3D space to the 3D space
 pub struct Transform {
-    tx: f32,
-    ty: f32,
-    tz: f32,
+    translation: Vector3,
     // how to represent the rotation ?
-    a11: f32,
-    a12: f32,
-    a13: f32,
-    a21: f32,
-    a22: f32,
-    a23: f32,
-    a31: f32,
-    a32: f32,
-    a33: f32,
+    rotation: Matrix3,
+}
+
+impl Transform {
+    pub fn new(t: Vector3, R: Matrix3) -> Self {
+        Self { translation: t, rotation: R }
+    }
+
+    pub fn apply(&self, vec: Vector3) -> Vector3 {
+        (self.rotation.clone() * vec) + self.translation
+    }
 }

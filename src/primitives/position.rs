@@ -2,7 +2,8 @@ use crate::primitives::vector::Vector3;
 
 pub struct Position {
     pos: Vector3,
-    orientation: Vector3,
+    // for now, we only assume that there is a rotation in the z-axis
+    rotz: f32,
 }
 
 impl Position {
@@ -10,11 +11,15 @@ impl Position {
         &self.pos
     }
 
-    pub fn orientation(&self) -> &Vector3 {
-        &self.orientation
+    pub fn rotation_z(&self) -> f32 {
+        self.rotz
     }
 
-    pub fn new(pos: Vector3, orientation: Vector3) -> Self {
-        Self { pos, orientation }
+    pub fn orientation(&self) -> Vector3 {
+        Vector3::new(f32::cos(self.rotz), f32::sin(self.rotz), 0.0)
+    }
+
+    pub fn new(pos: Vector3, rotz: f32) -> Self {
+        Self { pos, rotz }
     }
 }

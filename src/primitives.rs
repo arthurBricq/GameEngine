@@ -6,3 +6,4 @@ pub mod position;
 pub mod vector;
 pub mod camera;
 pub mod transformation;
+pub mod matrix3;

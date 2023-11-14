@@ -1,8 +1,8 @@
-use std::ffi::c_long;
+
 use crate::primitives::camera::Camera;
-use crate::primitives::line::Line;
+
 use crate::primitives::point::Point2;
-use crate::primitives::position::Position;
+
 use crate::primitives::vector::Vector3;
 
 /// A cubic face is an oriented square in space
@@ -50,7 +50,7 @@ impl CubicFace3 {
     //     to_return
     // }
 
-    pub fn projection(&self, camera: &Camera) -> CubicFace2 {
+    pub fn projection(&self, _camera: &Camera) -> CubicFace2 {
         todo!("Project each point of the face and create the 2D face")
     }
 }

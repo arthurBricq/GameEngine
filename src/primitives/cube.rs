@@ -1,5 +1,5 @@
 use crate::primitives::cubic_face::CubicFace3;
-use crate::primitives::line::Line;
+
 use crate::primitives::position::Position;
 use crate::primitives::vector::Vector3;
 
@@ -43,7 +43,7 @@ impl Cube3 {
         for face in &self.faces {
             // Compute the dot product between the normal of the face and the orientation
             // The face can be seen only if the dot product is negative
-            let n = face.normal().dot(from.orientation());
+            let n = face.normal().dot(&from.orientation());
             if n < 0.0 {
                 to_return.push(face);
             }

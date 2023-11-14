@@ -1,5 +1,5 @@
-use std::ops::{Add, Sub};
-use crate::primitives::vector::Vector3;
+
+
 
 /// A point in 2D coordinates
 #[derive(Copy, Clone, PartialEq)]
