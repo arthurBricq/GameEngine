@@ -1,15 +1,16 @@
-
 use pixels::{Error, Pixels, SurfaceTexture};
 
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
+use winit::event::VirtualKeyCode::C;
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
 
-
 use crate::drawable::Drawable;
+use crate::primitives::camera::Camera;
+use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face::CubicFace3;
 use crate::primitives::position::Position;
@@ -44,23 +45,40 @@ fn main() -> Result<(), Error> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
 
-    // Create a world with 1 object
-    let mut world = World::new();
+    // Create a world with a standard camera
+    let mut world = World::new(Camera::new(
+        Position::new(Vector3::empty(), 0.0),
+        100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
+    ));
+
+    // Add a cube
     let bottom_face = CubicFace3::from_line(
         Vector3::new(0.0, 0.0, 0.0),
         Vector3::new(1.0, 0.0, 0.0),
-        false
+        false,
+        Color::purple()
     );
     let cube = Cube3::from_face(bottom_face, 2.0);
     world.add_object(cube);
 
     // Sets the camera as looking at the object
-    world.set_camera(Position::new(
+    world.set_camera_position(Position::new(
         Vector3::new(-2.0, 0.0, 0.0),
-        0.0
+        0.0,
     ));
 
-    // Parse the world as drawable and start the UI loop
+    let supported_keys = [
+        VirtualKeyCode::R,
+        VirtualKeyCode::E,
+        VirtualKeyCode::J,
+        VirtualKeyCode::K,
+        VirtualKeyCode::Down,
+        VirtualKeyCode::Up,
+        VirtualKeyCode::Left,
+        VirtualKeyCode::Right,
+    ];
+
+    // Parse the world as a drawable and start the UI loop
     let mut world: Box<dyn Drawable> = Box::new(world);
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
@@ -86,6 +104,13 @@ fn main() -> Result<(), Error> {
             if input.key_pressed(VirtualKeyCode::Escape) || input.close_requested() {
                 *control_flow = ControlFlow::Exit;
                 return;
+            }
+
+            // Handle some keys
+            for key in supported_keys {
+                if input.key_pressed(key) {
+                    world.key_pressed(key)
+                }
             }
 
             // Resize the window

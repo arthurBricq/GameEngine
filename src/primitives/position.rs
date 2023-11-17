@@ -22,4 +22,12 @@ impl Position {
     pub fn new(pos: Vector3, rotz: f32) -> Self {
         Self { pos, rotz }
     }
+
+    pub fn apply_z_rot(&mut self, rot: f32) {
+        self.rotz += rot;
+    }
+
+    pub fn translate(&mut self, by: &Vector3) {
+        self.pos = self.pos + *by
+    }
 }

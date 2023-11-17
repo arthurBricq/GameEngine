@@ -1,3 +1,4 @@
+use crate::primitives::camera::Camera;
 use crate::primitives::cubic_face::CubicFace3;
 
 use crate::primitives::position::Position;
@@ -27,28 +28,103 @@ impl Cube3 {
 
         // Construct the missing faces
         let n = bottom.normal();
-        let top = CubicFace3::new([p0, p1, p2, p3], n.opposite());
-        let f01 = CubicFace3::new([p0, p1, points[1], points[0]], p1 - p2);
-        let f12 = CubicFace3::new([p1, p2, points[2], points[1]], p1 - p0);
-        let f23 = CubicFace3::new([p2, p3, points[3], points[2]], p2 - p1);
-        let f30 = CubicFace3::new([p3, p0, points[0], points[3]], p0 - p1);
+        let c = bottom.color();
+        let top = CubicFace3::new([p0, p1, p2, p3], n.opposite(), c.randomize_dimension(2));
+        let f01 = CubicFace3::new([p0, p1, points[1], points[0]], p1 - p2, c.randomize_dimension(3));
+        let f12 = CubicFace3::new([p1, p2, points[2], points[1]], p1 - p0, c.randomize_dimension(3));
+        let f23 = CubicFace3::new([p2, p3, points[3], points[2]], p2 - p1, c.randomize_dimension(3));
+        let f30 = CubicFace3::new([p3, p0, points[0], points[3]], p0 - p1, c.randomize_dimension(3));
 
         Self {
             faces: [bottom, top, f01, f12, f23, f30],
         }
     }
 
-    pub fn get_visible_faces(&self, from: &Position) -> Vec<&CubicFace3> {
+    /// Criteria for a face to be seen:
+    /// * the dot product between the camera's orientation and the face's normal
+    ///   is negative.
+    /// * the dot product between the face's normal and the vector going to the camera is
+    ///   also negative
+    pub fn get_visible_faces(&self, camera: &Camera) -> Vec<&CubicFace3> {
         let mut to_return = Vec::new();
         for face in &self.faces {
-            // Compute the dot product between the normal of the face and the orientation
-            // The face can be seen only if the dot product is negative
-            let n = face.normal().dot(&from.orientation());
-            if n < 0.0 {
-                to_return.push(face);
+            // hopefully this is optimized out
+            let dot1 = face.normal().dot(&camera.position().orientation());
+            let cam_to_center = face.center() - *camera.position().position();
+            let dot2 = face.normal().dot(&cam_to_center);
+
+            if dot1 <= 0.0 {
+                if dot2 < 0.0 {
+                    to_return.push(face);
+                }
             }
-            // TODO the position can be used to do a better decision
+
         }
         to_return
+    }
+
+    /// Rotate the rectangle by a provided angle
+    pub fn rotate(&mut self, by: f32) {
+        for face in &mut self.faces {
+            face.rotate(by);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::f32::consts::PI;
+    use crate::primitives::camera::Camera;
+    use crate::primitives::color::Color;
+    use crate::primitives::cube::Cube3;
+    use crate::primitives::cubic_face::CubicFace3;
+    use crate::primitives::position::Position;
+    use crate::primitives::vector::Vector3;
+
+    fn cam(x: f32, y: f32, theta_z: f32) -> Camera {
+        Camera::new(
+            Position::new(Vector3::new(x, y, 0.0), theta_z),
+            100.,
+            0.0,
+            0.0
+        )
+    }
+
+    #[test]
+    fn visible_faces() {
+        // Create a cube
+        let bottom_face = CubicFace3::from_line(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(1.0, 0.0, 0.0),
+            false,
+            Color::purple()
+        );
+        println!("Bottom face = {bottom_face:?}");
+
+        let cube = Cube3::from_face(bottom_face, 2.0);
+
+        // when looking in the wrong direction, no face should be seen
+        let cam1 = cam(2.0, 0.5, 0.0);
+        let faces = cube.get_visible_faces(&cam1);
+        assert_eq!(0, faces.len());
+
+        // when looking forward, only 1 face must be seen
+        let cam1 = cam(2.0, 0.5, PI);
+        let faces = cube.get_visible_faces(&cam1);
+        println!("{faces:#?}");
+        assert_eq!(1, faces.len());
+
+        // When looking from the side, 2 faces should be seen
+        let cam1 = cam(2.0, 2.0, PI + PI / 4.);
+        let faces = cube.get_visible_faces(&cam1);
+        println!("{faces:#?}");
+        assert_eq!(2, faces.len());
+
+        // When looking from the side, but on top, 3 faces should be seen
+        let mut cam1 = cam(2.0, 2.0, PI + PI / 4.);
+        cam1.translate(&Vector3::new(0., 0., 3.));
+        let faces = cube.get_visible_faces(&cam1);
+        println!("{faces:#?}");
+        assert_eq!(3, faces.len());
     }
 }

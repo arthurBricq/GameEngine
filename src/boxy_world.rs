@@ -1,3 +1,4 @@
+use winit::event::VirtualKeyCode;
 use crate::drawable::Drawable;
 use crate::{HEIGHT, WIDTH};
 
@@ -63,5 +64,9 @@ impl Drawable for BoxyWorld {
 
             pixel.copy_from_slice(&rgba);
         }
+    }
+
+    fn key_pressed(&mut self, key: VirtualKeyCode) {
+        todo!()
     }
 }

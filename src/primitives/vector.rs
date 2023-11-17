@@ -1,9 +1,10 @@
-use std::ops::{Add, Sub};
+use std::fmt::{Debug, Formatter};
+use std::ops::{Add, Div, Sub};
 
 /// A vector in 3 coordinates
 ///
 /// Mathematically, it can represent equally a 3d vector or a 3d point
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Vector3 {
     x: f32,
     y: f32,
@@ -38,7 +39,7 @@ impl Vector3 {
 
     /// Dot product with another vector
     pub fn dot(&self, vec: &Vector3) -> f32 {
-        self.x * vec.x + self.y + vec.y + self.z * vec.z
+        self.x * vec.x + self.y * vec.y + self.z * vec.z
     }
 
     /// Returns a vector in the opposite direction
@@ -69,7 +70,14 @@ impl Vector3 {
     }
 
     pub fn norm(&self) -> f32 {
-        f32::sqrt(self.x * self.x + self.y * self.y)
+        f32::sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
+    }
+
+    pub fn normalize(&mut self) {
+        let n = self.norm();
+        self.x /= n;
+        self.y /= n;
+        self.z /= n;
     }
 }
 
@@ -94,5 +102,23 @@ impl Sub for Vector3 {
             y: self.y - rhs.y,
             z: self.z - rhs.z,
         }
+    }
+}
+
+impl Div<f32> for Vector3 {
+    type Output = Vector3;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        Self {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+        }
+    }
+}
+
+impl Debug for Vector3 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }
