@@ -2,7 +2,8 @@ use winit::event::VirtualKeyCode;
 use crate::drawable::Drawable;
 use crate::primitives::camera::Camera;
 use crate::primitives::cube::Cube3;
-use crate::primitives::cubic_face::CubicFace2;
+use crate::primitives::cubic_face::{CubicFace2, CubicFace3};
+use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
 use crate::primitives::position::Position;
 use crate::primitives::vector::Vector3;
@@ -11,7 +12,7 @@ use crate::WIDTH;
 /// Representation of the world in 3D coordinates
 /// A world simply contains several objects
 pub struct World {
-    objects: Vec<Cube3>,
+    objects: Vec<Box<dyn Object>>,
     camera: Camera,
 }
 
@@ -23,8 +24,12 @@ impl World {
         }
     }
 
-    pub fn add_object(&mut self, object: Cube3) {
-        self.objects.push(object);
+    pub fn add_cube(&mut self, cube: Cube3) {
+        self.objects.push(Box::new(cube));
+    }
+
+    pub fn add_face(&mut self, face: CubicFace3) {
+        self.objects.push(Box::new(face));
     }
 
     pub fn set_camera_position(&mut self, camera: Position) {
@@ -45,11 +50,8 @@ impl Drawable for World {
             for face in faces {
                 let face2d = face.projection(&self.camera);
                 faces2.push(face2d);
-                // println!("3D face: = {face:?}");
-                // println!("2D face: = {face2d:?}");
             }
         }
-
 
         for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
             let x = (i % WIDTH as usize) as i16;
@@ -57,6 +59,10 @@ impl Drawable for World {
 
             // Check if the point is contained in a face
             let contained = faces2.iter().any(|face2| face2.contains(&Point2::new(x as f32, y as f32)));
+
+            if x > 160 && x < 193 && y < 53 && y > 20 {
+                // print!("{contained}");
+            }
 
             // find the first face of this point (if it exists)
             let rgba = if let Some(face) = faces2
@@ -70,7 +76,9 @@ impl Drawable for World {
         }
     }
 
-    fn left_mouse_pressed(&mut self, _x: i16, _y: i16) {}
+    fn left_mouse_pressed(&mut self, _x: i16, _y: i16) {
+        println!("{_x}, {_y}");
+    }
 
     fn key_pressed(&mut self, key: VirtualKeyCode) {
         match key {

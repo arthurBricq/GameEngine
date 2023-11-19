@@ -51,7 +51,9 @@ fn main() -> Result<(), Error> {
         100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
     ));
 
-    // Add a cube
+    // Create some 3D objects
+    /*
+    */
     let bottom_face = CubicFace3::from_line(
         Vector3::new(0.0, 0.0, 0.0),
         Vector3::new(1.0, 0.0, 0.0),
@@ -59,13 +61,46 @@ fn main() -> Result<(), Error> {
         Color::purple()
     );
     let cube = Cube3::from_face(bottom_face, 2.0);
-    world.add_object(cube);
+
+    // Add some faces
+    let x: f32 = 0.5;
+    let y: f32 = -1.5;
+    let z: f32 = 2.;
+    let f1 = CubicFace3::new([
+                                 Vector3::new(x, y, z),
+                                 Vector3::new(x+1., y, z),
+                                 Vector3::new(x+1., y+1.0, z),
+                                 Vector3::new(x, y+1.0, z),
+                             ],
+                             Vector3::new(0., 0., -1.),
+                             Color::dark_blue(),
+    );
+
+    let x: f32 = 1.5;
+    let y: f32 = -1.5;
+    let z: f32 = -1.;
+    let f2 = CubicFace3::new([
+                                 Vector3::new(x, y, z),
+                                 Vector3::new(x, y+1., z),
+                                 Vector3::new(x, y+1., z+3.),
+                                 Vector3::new(x, y, z+3.),
+                             ],
+                             Vector3::new(-1., 0., 0.),
+                             Color::yellow(),
+    );
+
+    world.add_face(f1);
+    world.add_face(f2);
+    world.add_cube(cube);
 
     // Sets the camera as looking at the object
     world.set_camera_position(Position::new(
         Vector3::new(-2.0, 0.0, 0.0),
         0.0,
     ));
+
+    // Parse the world as a drawable
+    let mut world: Box<dyn Drawable> = Box::new(world);
 
     let supported_keys = [
         VirtualKeyCode::R,
@@ -78,8 +113,7 @@ fn main() -> Result<(), Error> {
         VirtualKeyCode::Right,
     ];
 
-    // Parse the world as a drawable and start the UI loop
-    let mut world: Box<dyn Drawable> = Box::new(world);
+    // UI loop
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {

@@ -3,6 +3,7 @@ use std::ptr::write;
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::matrix3::Matrix3;
+use crate::primitives::object::Object;
 
 use crate::primitives::point::Point2;
 
@@ -78,6 +79,33 @@ impl CubicFace3 {
         // The normal vector also has to be rotated
         self.normal = mat.clone() * self.normal;
     }
+
+    pub fn is_visible_from(&self, camera: &Camera) -> bool {
+        let dot1 = self.normal().dot(&camera.position().orientation());
+        let cam_to_center = self.center() - *camera.position().position();
+        let dot2 = self.normal().dot(&cam_to_center);
+        if dot1 <= 0.0 {
+            if dot2 < 0.0 {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+impl Object for CubicFace3 {
+    fn get_visible_faces(&self, camera: &Camera) -> Vec<&CubicFace3> {
+        if self.is_visible_from(camera) {
+            vec![self]
+        } else {
+            // TODO maybe it's better to use an option ?
+            Vec::new()
+        }
+    }
+
+    fn rotate(&mut self, by: f32) {
+        self.rotate(by);
+    }
 }
 
 /// A cubic face is an oriented square in space
@@ -109,16 +137,21 @@ impl CubicFace2 {
         }
 
         // The point is contained inside the face if it is to the left of all segments
-        is_left_of_link(&self.points, 0, 1, point)
-            && is_left_of_link(&self.points, 1, 2, point)
-            && is_left_of_link(&self.points, 2, 3, point)
-            && is_left_of_link(&self.points, 3, 0, point)
+        let c1 = is_left_of_link(&self.points, 0, 1, point);
+        let c2 = is_left_of_link(&self.points, 1, 2, point);
+        let c3 = is_left_of_link(&self.points, 2, 3, point);
+        let c4 = is_left_of_link(&self.points, 3, 0, point);
+
+        // Returns true if all conditions are equals
+        return (c1 == c2) && (c1 == c3) && (c1 == c4)
     }
 
     pub fn color(&self) -> &Color {
         &self.color
     }
+
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -152,6 +185,21 @@ mod tests {
         assert!(!face2.contains(&Point2::new(-1.5, 0.5)));
         assert!(!face2.contains(&Point2::new(0.5, -1.5)));
         assert!(!face2.contains(&Point2::new(-1.5, -1.5)));
+    }
+
+    #[test]
+    fn contains2() {
+        let face2 = CubicFace2 {
+            points: [
+                Point2::new(160., 20.),
+                Point2::new(160., 53.3),
+                Point2::new(193.3, 53.3),
+                Point2::new(210., 20.),
+            ],
+            color: Color::purple()
+        };
+
+        assert!(face2.contains(&Point2::new(161., 21.)));
     }
 }
 

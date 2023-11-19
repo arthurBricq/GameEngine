@@ -27,6 +27,14 @@ impl Color {
         Self {r: 255, g: 0, b: 255, a: 255}
     }
 
+    pub fn yellow() -> Self {
+        Self {r: 255, g: 255, b: 0, a: 255}
+    }
+
+    pub fn dark_blue() -> Self {
+        Self {r: 0, g: 0, b: 153, a: 255}
+    }
+
     pub fn white() -> Self {
         Self {r: 0, g: 0, b: 0, a: 255}
     }
