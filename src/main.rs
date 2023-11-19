@@ -12,7 +12,7 @@ use crate::drawable::Drawable;
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
-use crate::primitives::cubic_face::CubicFace3;
+use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::position::Position;
 use crate::primitives::vector::Vector3;
 

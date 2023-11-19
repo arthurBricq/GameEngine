@@ -1,5 +1,6 @@
 pub mod cube;
-pub mod cubic_face;
+pub mod cubic_face3;
+pub mod cubic_face2;
 pub mod line;
 pub mod point;
 pub mod position;

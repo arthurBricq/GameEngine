@@ -1,8 +1,10 @@
 use winit::event::VirtualKeyCode;
+
 use crate::drawable::Drawable;
 use crate::primitives::camera::Camera;
 use crate::primitives::cube::Cube3;
-use crate::primitives::cubic_face::{CubicFace2, CubicFace3};
+use crate::primitives::cubic_face2::CubicFace2;
+use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
 use crate::primitives::position::Position;
@@ -60,9 +62,11 @@ impl Drawable for World {
             // Check if the point is contained in a face
             let contained = faces2.iter().any(|face2| face2.contains(&Point2::new(x as f32, y as f32)));
 
-            if x > 160 && x < 193 && y < 53 && y > 20 {
-                // print!("{contained}");
-            }
+            // let faces = faces2
+            //     .iter()
+            //     .filter(|face2| face2.contains(&Point2::new(x as f32, y as f32)))
+            //     .enumerate()
+            //     .min_by_key();
 
             // find the first face of this point (if it exists)
             let rgba = if let Some(face) = faces2
