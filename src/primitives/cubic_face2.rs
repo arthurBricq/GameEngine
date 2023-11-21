@@ -101,7 +101,7 @@ mod tests {
     use crate::primitives::cubic_face2::CubicFace2;
     use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::point::Point2;
-    use crate::primitives::position::Position;
+    use crate::primitives::position::Pose;
     use crate::primitives::vector::Vector3;
 
     #[test]
@@ -150,7 +150,7 @@ mod tests {
     fn raytracing_distance() {
         // Create a camera
         let camera = Camera::new(
-            Position::new(Vector3::new(-2.0, 0., 0.), 0.0),
+            Pose::new(Vector3::new(-2.0, 0., 0.), 0.0),
             100.0, 100., 100.
         );
 

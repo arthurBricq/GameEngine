@@ -1,20 +1,20 @@
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
-use crate::primitives::position::Position;
+use crate::primitives::position::Pose;
 use crate::primitives::transformation::Transform;
 use crate::primitives::vector::Vector3;
 
 /// A camera is a position and calibration parameters
 pub struct Camera {
-    position: Position,
+    pose: Pose,
     f: f32,
     px: f32,
     py: f32,
 }
 
 impl Camera {
-    pub fn new(position: Position, f: f32, px: f32, py: f32) -> Self {
-        Self { position, f, px, py }
+    pub fn new(position: Pose, f: f32, px: f32, py: f32) -> Self {
+        Self { pose: position, f, px, py }
     }
 
     /// Project the provided point (in world frame) into pixels
@@ -36,19 +36,20 @@ impl Camera {
     }
 
     pub fn apply_z_rot(&mut self, rot: f32) {
-        self.position.apply_z_rot(rot)
+        self.pose.apply_z_rot(rot)
     }
 
-    pub fn set_position(&mut self, position: Position) {
-        self.position = position;
+    pub fn set_position(&mut self, position: Vector3) {
+        println!("new pos = {position:?}");
+        self.pose.set_position(position);
     }
 
-    pub fn position(&self) -> &Position {
-        &self.position
+    pub fn position(&self) -> &Pose {
+        &self.pose
     }
 
     pub fn translate(&mut self, by: &Vector3) {
-        self.position.translate(by);
+        self.pose.translate(by);
     }
 
     pub fn ray_direction(&self, u: i16, v: i16) -> Vector3 {
@@ -58,8 +59,8 @@ impl Camera {
 
 impl Camera {
     fn get_transform(&self) -> Transform {
-        Transform::new(self.position.position().opposite(),
-                       Matrix3::z_rotation(self.position.rotation_z()),
+        Transform::new(self.pose.position().opposite(),
+                       Matrix3::z_rotation(self.pose.rotation_z()),
         )
     }
 }
@@ -68,7 +69,7 @@ impl Camera {
 mod tests {
     use std::f32::consts::PI;
     use crate::primitives::camera::Camera;
-    use crate::primitives::position::Position;
+    use crate::primitives::position::Pose;
     use crate::primitives::vector::Vector3;
 
     #[test]
@@ -78,7 +79,7 @@ mod tests {
 
         // Create a camera
         let mut cam = Camera::new(
-            Position::new(
+            Pose::new(
                 Vector3::new(1.0, 0.0, 0.0),
                 0.0,
             ),

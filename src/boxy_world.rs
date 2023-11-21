@@ -69,4 +69,8 @@ impl Drawable for BoxyWorld {
     fn key_pressed(&mut self, key: VirtualKeyCode) {
         todo!()
     }
+
+    fn key_held(&mut self, key: VirtualKeyCode) {
+        todo!()
+    }
 }

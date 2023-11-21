@@ -3,7 +3,7 @@ use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 
-use crate::primitives::position::Position;
+use crate::primitives::position::Pose;
 use crate::primitives::vector::Vector3;
 
 
@@ -76,12 +76,12 @@ mod tests {
     use crate::primitives::cube::Cube3;
     use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::object::Object;
-    use crate::primitives::position::Position;
+    use crate::primitives::position::Pose;
     use crate::primitives::vector::Vector3;
 
     fn cam(x: f32, y: f32, theta_z: f32) -> Camera {
         Camera::new(
-            Position::new(Vector3::new(x, y, 0.0), theta_z),
+            Pose::new(Vector3::new(x, y, 0.0), theta_z),
             100.,
             0.0,
             0.0

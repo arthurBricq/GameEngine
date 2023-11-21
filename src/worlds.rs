@@ -1,13 +1,14 @@
 use winit::event::VirtualKeyCode;
 
 use crate::drawable::Drawable;
+use crate::motion_model::{DEFAULT_ACC, MotionModel};
 use crate::primitives::camera::Camera;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
-use crate::primitives::position::Position;
+use crate::primitives::position::Pose;
 use crate::primitives::vector::Vector3;
 use crate::WIDTH;
 
@@ -16,6 +17,7 @@ use crate::WIDTH;
 pub struct World {
     objects: Vec<Box<dyn Object>>,
     camera: Camera,
+    motion_model: MotionModel
 }
 
 impl World {
@@ -23,6 +25,7 @@ impl World {
         Self {
             objects: Vec::new(),
             camera,
+            motion_model: MotionModel::new()
         }
     }
 
@@ -34,13 +37,18 @@ impl World {
         self.objects.push(Box::new(face));
     }
 
-    pub fn set_camera_position(&mut self, camera: Position) {
-        self.camera.set_position(camera);
+    pub fn set_camera_position(&mut self, position: Vector3) {
+        self.camera.set_position(position);
     }
 }
 
 impl Drawable for World {
-    fn update(&mut self) {}
+    fn update(&mut self) {
+        // Update is called at each iteration
+        self.camera.set_position(
+            self.motion_model.new_pos(self.camera.position().position(), 0.01)
+        );
+    }
 
     fn draw(&self, frame: &mut [u8]) {
         let mut faces2: Vec<CubicFace2> = Vec::new();
@@ -93,10 +101,10 @@ impl Drawable for World {
 
     fn key_pressed(&mut self, key: VirtualKeyCode) {
         match key {
-            VirtualKeyCode::Up => self.camera.translate(&Vector3::new(0.1, 0.0, 0.0)),
-            VirtualKeyCode::Down => self.camera.translate(&Vector3::new(-0.1, 0.0, 0.0)),
-            VirtualKeyCode::Right => self.camera.translate(&Vector3::new(0.0, 0.1, 0.0)),
-            VirtualKeyCode::Left => self.camera.translate(&Vector3::new(0.0, -0.1, 0.0)),
+            //VirtualKeyCode::Up => self.camera.translate(&Vector3::new(0.1, 0.0, 0.0)),
+            //VirtualKeyCode::Down => self.camera.translate(&Vector3::new(-0.1, 0.0, 0.0)),
+            //VirtualKeyCode::Right => self.camera.translate(&Vector3::new(0.0, 0.1, 0.0)),
+            //VirtualKeyCode::Left => self.camera.translate(&Vector3::new(0.0, -0.1, 0.0)),
             VirtualKeyCode::J => self.camera.translate(&Vector3::new(0.0, 0.0, -0.1)),
             VirtualKeyCode::K => self.camera.translate(&Vector3::new(0.0, 0.0, 0.1)),
             VirtualKeyCode::R => {
@@ -109,6 +117,14 @@ impl Drawable for World {
                     o.rotate(-std::f32::consts::PI / 16.);
                 }
             },
+            _ => {}
+        }
+    }
+
+    fn key_held(&mut self, key: VirtualKeyCode) {
+        match key {
+            VirtualKeyCode::Up => self.motion_model.apply(0, DEFAULT_ACC),
+            VirtualKeyCode::Down => self.motion_model.apply(0, DEFAULT_ACC),
             _ => {}
         }
     }

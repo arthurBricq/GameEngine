@@ -1,12 +1,12 @@
 use crate::primitives::vector::Vector3;
 
-pub struct Position {
+pub struct Pose {
     pos: Vector3,
     // for now, we only assume that there is a rotation in the z-axis
     rotz: f32,
 }
 
-impl Position {
+impl Pose {
     pub fn position(&self) -> &Vector3 {
         &self.pos
     }
@@ -29,5 +29,9 @@ impl Position {
 
     pub fn translate(&mut self, by: &Vector3) {
         self.pos = self.pos + *by
+    }
+
+    pub fn set_position(&mut self, pos: Vector3) {
+        self.pos = pos;
     }
 }

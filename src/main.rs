@@ -13,7 +13,7 @@ use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
-use crate::primitives::position::Position;
+use crate::primitives::position::Pose;
 use crate::primitives::vector::Vector3;
 
 use crate::worlds::World;
@@ -22,6 +22,7 @@ mod boxy_world;
 mod drawable;
 mod primitives;
 mod worlds;
+mod motion_model;
 
 pub const WIDTH: u32 = 320;
 pub const HEIGHT: u32 = 240;
@@ -47,7 +48,7 @@ fn main() -> Result<(), Error> {
 
     // Create a world with a standard camera
     let mut world = World::new(Camera::new(
-        Position::new(Vector3::empty(), 0.0),
+        Pose::new(Vector3::empty(), 0.0),
         100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
     ));
 
@@ -109,19 +110,19 @@ fn main() -> Result<(), Error> {
     world.add_cube(cube);
 
     // Sets the camera as looking at the object
-    world.set_camera_position(Position::new(
-        Vector3::new(-2.0, 0.0, 0.0),
-        0.0,
-    ));
+    world.set_camera_position(Vector3::new(-2.0, 0.0, 0.0), );
 
     // Parse the world as a drawable
     let mut world: Box<dyn Drawable> = Box::new(world);
 
-    let supported_keys = [
+    let supported_keys_pressed = [
         VirtualKeyCode::R,
         VirtualKeyCode::E,
         VirtualKeyCode::J,
         VirtualKeyCode::K,
+    ];
+
+    let supported_keys_held = [
         VirtualKeyCode::Down,
         VirtualKeyCode::Up,
         VirtualKeyCode::Left,
@@ -156,9 +157,15 @@ fn main() -> Result<(), Error> {
             }
 
             // Handle some keys
-            for key in supported_keys {
+            for key in supported_keys_pressed {
                 if input.key_pressed(key) {
                     world.key_pressed(key)
+                }
+            }
+
+            for key in supported_keys_held {
+                if input.key_held(key) {
+                    world.key_held(key)
                 }
             }
 

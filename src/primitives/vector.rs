@@ -1,5 +1,5 @@
 use std::fmt::{Debug, Formatter};
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, Sub};
 use crate::primitives::matrix3::Matrix3;
 
 /// A vector in 3 coordinates
@@ -91,6 +91,14 @@ impl Add for Vector3 {
             y: self.y + rhs.y,
             z: self.z + rhs.z,
         }
+    }
+}
+
+impl AddAssign for Vector3 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.x;
+        self.z += rhs.x;
     }
 }
 

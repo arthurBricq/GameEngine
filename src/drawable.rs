@@ -10,4 +10,8 @@ pub trait Drawable {
     fn left_mouse_pressed(&mut self, x: i16, y: i16);
     /// A key was pressed
     fn key_pressed(&mut self, key: VirtualKeyCode);
+    /// A key as held (maintaining press)
+    fn key_held(&mut self, key: VirtualKeyCode);
+
+
 }
