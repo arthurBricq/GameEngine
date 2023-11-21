@@ -64,17 +64,20 @@ impl Drawable for World {
 
             // TODO : find the closest face intersecting with the ray
 
-            // let faces = faces2
-            //     .iter()
-            //     .filter(|face2| face2.contains(&Point2::new(x as f32, y as f32)))
-            //     .enumerate()
-            //     .min_by_key(|(i, face2)|
-            //         face2.raytracing_distance(x, y, &self.camera)
-            //     );
+            let closest_face = faces2
+                .iter()
+                .filter(|face2| face2.contains(&Point2::new(x as f32, y as f32)))
+                // .enumerate()
+                .min_by_key(|face2|
+                    if let Some(d) = face2.raytracing_distance(x, y, &self.camera) {
+                        (d * 1000.) as u32
+                    } else {
+                        std::u32::MAX
+                    }
+                );
 
             // find the first face of this point (if it exists)
-            let rgba = if let Some(face) = faces2
-                .iter().find(|face2| face2.contains(&Point2::new(x as f32, y as f32))) {
+            let rgba = if let Some(face) = closest_face {
                 face.color().rgba()
             } else {
                [214, 214, 194, 150]

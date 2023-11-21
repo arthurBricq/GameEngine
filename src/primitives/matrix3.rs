@@ -120,14 +120,30 @@ impl Matrix3 {
     /// A x = rhs
     /// If there are no solution, returns none
     pub fn linear_solve(&self, rhs: Vector3) -> Option<Vector3> {
-        None
+        if self.invertible() {
+            Some(self.inverse() * rhs)
+        } else {
+            None
+        }
     }
 }
 
 impl Matrix3 {
+    fn determinant(&self) -> f32 {
+        self.a11 * self.a22 * self.a33
+            + self.a12 * self.a23 * self.a31
+            + self.a13 * self.a21 * self.a32
+            - self.a13 * self.a22 * self.a31
+            - self.a12 * self.a21 * self.a33
+            - self.a11 * self.a23 * self.a32
+    }
+
+    fn invertible(&self) -> bool {
+        self.determinant() != 0.
+    }
+
     fn inverse(&self) -> Matrix3 {
         // reference : https://semath.info/src/inverse-cofactor-ex3.html
-
         let a11 = self.a11;
         let a22 = self.a22;
         let a33 = self.a33;
@@ -138,14 +154,7 @@ impl Matrix3 {
         let a31 = self.a31;
         let a32 = self.a32;
 
-        let det = a11 * a22 * a33
-            + a12 * a23 * a31
-            + a13 * a21 * a32
-            - a13 * a22 * a31
-            - a12 * a21 * a33
-            - a11 * a23 * a32;
-
-        let inv = 1. / det;
+        let inv = 1. / self.determinant();
 
         Matrix3 {
             a11: (a22 * a33 - a23 * a32) * inv,
@@ -209,7 +218,7 @@ mod tests {
         assert_near(Vector3::new(0., 0., 1.), m2.col(2));
 
         let m3 = Matrix3::identity() * 2.;
-        let m4 = m1.inverse();
+        let m4 = m3.inverse();
         assert_near(Vector3::new(0.5, 0., 0.), m4.col(0));
         assert_near(Vector3::new(0., 0.5, 0.), m4.col(1));
         assert_near(Vector3::new(0., 0., 0.5), m4.col(2));

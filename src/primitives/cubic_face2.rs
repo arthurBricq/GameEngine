@@ -54,10 +54,8 @@ impl<'a> CubicFace2<'a> {
         return (c1 == c2) && (c1 == c3) && (c1 == c4);
     }
 
-    /// Returns the distance between the face
-    ///
-    /// Note: The returned distance is in millimeter, as an u64. This is because f32 (are all float
-    /// types) do not implement Ord.
+    /// Returns the raytraciing distance between the face and a ray defined as the pixels
+    /// of the camera's screen.
     pub fn raytracing_distance(&self, u: i16, v: i16, camera: &Camera) -> Option<f32> {
         // Notation (*) means to be determined
         // C     = camera location
@@ -72,6 +70,7 @@ impl<'a> CubicFace2<'a> {
         if let Some(face) = self.face3 {
             let v = camera.ray_direction(u, v);
             let points = face.points();
+            let c = *camera.position().position();
             let p = points[0];
             let a = points[1] - p;
             let b = points[3] - p;
@@ -79,7 +78,7 @@ impl<'a> CubicFace2<'a> {
                                  a.y(), b.y(), -v.y(),
                                  a.z(), b.z(), -v.z(),
             );
-            let rhs = *camera.position().position() - v;
+            let rhs = c - p;
             // Solve the system
             if let Some(solution) = A.linear_solve(rhs) {
                 let alpha = solution.x();
@@ -100,6 +99,7 @@ mod tests {
     use crate::primitives::camera::Camera;
     use crate::primitives::color::Color;
     use crate::primitives::cubic_face2::CubicFace2;
+    use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::point::Point2;
     use crate::primitives::position::Position;
     use crate::primitives::vector::Vector3;
@@ -148,6 +148,49 @@ mod tests {
     #[test]
     /// Test that the raytracing algorithm works well
     fn raytracing_distance() {
+        // Create a camera
+        let camera = Camera::new(
+            Position::new(Vector3::new(-2.0, 0., 0.), 0.0),
+            100.0, 100., 100.
+        );
 
+        // Create a cubic2 face facing the camera
+        let x: f32 = 0.;
+        let y: f32 = -2.;
+        let z: f32 = -2.;
+        let face = CubicFace3::new([
+                                     Vector3::new(x, y, z),
+                                     Vector3::new(x, y+4., z),
+                                     Vector3::new(x, y+4., z+4.),
+                                     Vector3::new(x, y, z+4.),
+                                 ],
+                                 Vector3::new(-1., 0., 0.),
+                                 Color::yellow(),
+        );
+
+        // Now let's get serious
+        let projection = face.projection(&camera);
+        println!("Projection = {projection:?}");
+
+        let d1 = projection.raytracing_distance(100, 100, &camera);
+        assert_eq!(d1, Some(2.));
+
+        let d2 = projection.raytracing_distance(110, 100, &camera);
+        let d3 = projection.raytracing_distance(90, 100, &camera);
+        assert!(d2.unwrap() > d1.unwrap());
+        assert!(d3.unwrap() > d1.unwrap());
+        assert_eq!(d2, d3);
+
+        let d4 = projection.raytracing_distance(100, 110, &camera);
+        let d5 = projection.raytracing_distance(100, 90, &camera);
+        assert!(d4.unwrap() > d1.unwrap());
+        assert!(d5.unwrap() > d1.unwrap());
+        assert_eq!(d4, d5);
+        //
+        // println!("{d1:#?}");
+        // println!("{:#?}",  projection.raytracing_distance(110, 100, &camera));
+        // println!("{:#?}",  projection.raytracing_distance(90, 100, &camera));
+        // println!("{:#?}",  projection.raytracing_distance(100, 110, &camera));
+        // println!("{:#?}",  projection.raytracing_distance(100, 90, &camera));
     }
 }

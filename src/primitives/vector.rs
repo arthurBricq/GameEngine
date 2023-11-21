@@ -1,5 +1,6 @@
 use std::fmt::{Debug, Formatter};
-use std::ops::{Add, Div, Sub};
+use std::ops::{Add, Div, Mul, Sub};
+use crate::primitives::matrix3::Matrix3;
 
 /// A vector in 3 coordinates
 ///
@@ -89,6 +90,18 @@ impl Add for Vector3 {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
             z: self.z + rhs.z,
+        }
+    }
+}
+
+impl Mul<f32> for Vector3 {
+    type Output = Vector3;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
         }
     }
 }
