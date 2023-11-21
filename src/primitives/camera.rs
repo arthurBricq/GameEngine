@@ -50,6 +50,10 @@ impl Camera {
     pub fn translate(&mut self, by: &Vector3) {
         self.position.translate(by);
     }
+
+    pub fn ray_direction(&self, u: i16, v: i16) -> Vector3 {
+        Vector3::new(1.0, (u as f32 - self.px) / self.f, (v as f32 - self.py) / self.f)
+    }
 }
 
 impl Camera {

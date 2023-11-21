@@ -62,11 +62,15 @@ impl Drawable for World {
             // Check if the point is contained in a face
             let contained = faces2.iter().any(|face2| face2.contains(&Point2::new(x as f32, y as f32)));
 
+            // TODO : find the closest face intersecting with the ray
+
             // let faces = faces2
             //     .iter()
             //     .filter(|face2| face2.contains(&Point2::new(x as f32, y as f32)))
             //     .enumerate()
-            //     .min_by_key();
+            //     .min_by_key(|(i, face2)|
+            //         face2.raytracing_distance(x, y, &self.camera)
+            //     );
 
             // find the first face of this point (if it exists)
             let rgba = if let Some(face) = faces2

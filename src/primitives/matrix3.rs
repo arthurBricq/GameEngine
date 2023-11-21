@@ -26,6 +26,24 @@ impl Mul<Vector3> for Matrix3 {
     }
 }
 
+impl Mul<f32> for Matrix3 {
+    type Output = Matrix3;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Matrix3 {
+            a11: self.a11 * rhs,
+            a12: self.a12 * rhs,
+            a13: self.a13 * rhs,
+            a21: self.a21 * rhs,
+            a22: self.a22 * rhs,
+            a23: self.a23 * rhs,
+            a31: self.a31 * rhs,
+            a32: self.a32 * rhs,
+            a33: self.a33 * rhs,
+        }
+    }
+}
+
 impl Matrix3 {
     pub fn new(a11: f32, a12: f32, a13: f32, a21: f32, a22: f32, a23: f32, a31: f32, a32: f32, a33: f32) -> Self {
         Self { a11, a12, a13, a21, a22, a23, a31, a32, a33 }
@@ -97,6 +115,59 @@ impl Matrix3 {
             a33: z * z * (1. - c) + c,
         }
     }
+
+    /// Solve the linear equation
+    /// A x = rhs
+    /// If there are no solution, returns none
+    pub fn linear_solve(&self, rhs: Vector3) -> Option<Vector3> {
+        None
+    }
+}
+
+impl Matrix3 {
+    fn inverse(&self) -> Matrix3 {
+        // reference : https://semath.info/src/inverse-cofactor-ex3.html
+
+        let a11 = self.a11;
+        let a22 = self.a22;
+        let a33 = self.a33;
+        let a12 = self.a12;
+        let a13 = self.a13;
+        let a21 = self.a21;
+        let a23 = self.a23;
+        let a31 = self.a31;
+        let a32 = self.a32;
+
+        let det = a11 * a22 * a33
+            + a12 * a23 * a31
+            + a13 * a21 * a32
+            - a13 * a22 * a31
+            - a12 * a21 * a33
+            - a11 * a23 * a32;
+
+        let inv = 1. / det;
+
+        Matrix3 {
+            a11: (a22 * a33 - a23 * a32) * inv,
+            a12: -(a12 * a33 - a13 * a32) * inv,
+            a13: (a12 * a23 - a13 * a22) * inv,
+            a21: -(a21 * a33 - a23 * a31) * inv,
+            a22: (a11 * a33 - a13 * a31) * inv,
+            a23: -(a11 * a23 - a13 * a21) * inv,
+            a31: (a21 * a32 - a22 * a31) * inv,
+            a32: -(a11 * a32 - a12 * a31) * inv,
+            a33: (a11 * a22 - a12 * a21) * inv,
+        }
+    }
+
+    fn col(&self, i: usize) -> Vector3 {
+        match i {
+            0 => Vector3::new(self.a11, self.a21, self.a31),
+            1 => Vector3::new(self.a12, self.a22, self.a32),
+            2 => Vector3::new(self.a13, self.a23, self.a33),
+            _ => panic!("Not possible")
+        }
+    }
 }
 
 #[cfg(test)]
@@ -127,5 +198,20 @@ mod tests {
 
         assert_near(Matrix3::rotation_around(pi / 2.0, vz) * vx, vy.opposite());
         assert_near(Matrix3::rotation_around(pi / 2.0, vz) * vy, vx);
+    }
+
+    #[test]
+    fn inverse_simple_matrix() {
+        let m1 = Matrix3::identity();
+        let m2 = m1.inverse();
+        assert_near(Vector3::new(1., 0., 0.), m2.col(0));
+        assert_near(Vector3::new(0., 1., 0.), m2.col(1));
+        assert_near(Vector3::new(0., 0., 1.), m2.col(2));
+
+        let m3 = Matrix3::identity() * 2.;
+        let m4 = m1.inverse();
+        assert_near(Vector3::new(0.5, 0., 0.), m4.col(0));
+        assert_near(Vector3::new(0., 0.5, 0.), m4.col(1));
+        assert_near(Vector3::new(0., 0., 0.5), m4.col(2));
     }
 }
