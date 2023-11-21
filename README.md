@@ -19,3 +19,17 @@ A basic camera model consists of
 Let a point $x = [x,y,z]$ expressed in the world coordinate. The homogenous transformation $T$ such that the same point is expressed in camera coordinates $X = [X,Y,Z]$ is given by $X' = T x'$ (where $x'$ denotes the homogeneous coordinates), and $T = [R, t]$.
 
 To express the rotation matrix $R$, one can simply write $R = [r1, r2, r3]$ where $r_i$ is the world's i-th axis expressed in camera coordinates.
+
+## Personal TODO
+
+- game engine
+    - [x] raytracing
+    - [x] overlapping objects
+    - [ ] better user-interface
+      - [ ] acceleration
+      - [ ] block motion at objects : obstacle detection
+      - [ ] handle rotation of the user
+    - [ ] better way to create worlds : create a file format and a parser ?
+
+When all of this is finished, we can start to implement doom 
+

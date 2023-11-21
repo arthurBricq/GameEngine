@@ -39,6 +39,19 @@ impl CubicFace3 {
         }
     }
 
+    /// Creates a face pointing in the x direction
+    pub fn create_simple_face(x: f32, y: f32, z: f32, w: f32, h: f32, c: Color) -> Self {
+        CubicFace3::new([
+                            Vector3::new(x, y, z),
+                            Vector3::new(x, y + w, z),
+                            Vector3::new(x, y + w, z - h),
+                            Vector3::new(x, y, z - h),
+                        ],
+                        Vector3::new(-1., 0., -0.),
+                        c
+        )
+    }
+
     pub fn new(points: [Vector3; 4], normal: Vector3, color: Color) -> Self {
         Self { points, normal, color }
     }

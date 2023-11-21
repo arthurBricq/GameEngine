@@ -63,6 +63,7 @@ fn main() -> Result<(), Error> {
     let cube = Cube3::from_face(bottom_face, 2.0);
 
     // Add some faces
+    /*
     let x: f32 = 0.5;
     let y: f32 = -1.5;
     let z: f32 = 2.;
@@ -88,9 +89,23 @@ fn main() -> Result<(), Error> {
                              Vector3::new(-1., 0., 0.),
                              Color::yellow(),
     );
-
     world.add_face(f1);
     world.add_face(f2);
+     */
+
+    world.add_face(
+        CubicFace3::create_simple_face(1.5, 0., 2., 2., 4., Color::red())
+    );
+    world.add_face(
+        CubicFace3::create_simple_face(2.5, 0.5, 2., 2., 4., Color::orange())
+    );
+    world.add_face(
+        CubicFace3::create_simple_face(3.5, 1., 2., 2., 4., Color::light_green())
+    );
+    world.add_face(
+        CubicFace3::create_simple_face(4.5, 1.5, 2., 2., 4., Color::dark_blue())
+    );
+
     world.add_cube(cube);
 
     // Sets the camera as looking at the object

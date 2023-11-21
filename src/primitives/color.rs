@@ -35,6 +35,26 @@ impl Color {
         Self {r: 0, g: 0, b: 153, a: 255}
     }
 
+    pub fn red() -> Self {
+        Self {r: 255, g: 51, b: 51, a: 255}
+    }
+
+    pub fn orange() -> Self {
+        Self {r: 255, g: 153, b: 51, a: 255}
+    }
+
+    pub fn light_green() -> Self {
+        Self {r: 153, g: 255, b: 51, a: 255}
+    }
+
+    pub fn green() -> Self {
+        Self {r: 51, g: 255, b: 51, a: 255}
+    }
+
+    pub fn turquoise() -> Self {
+        Self {r: 102, g: 255, b: 255, a: 255}
+    }
+
     pub fn white() -> Self {
         Self {r: 0, g: 0, b: 0, a: 255}
     }
