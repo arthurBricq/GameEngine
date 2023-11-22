@@ -1,3 +1,4 @@
+use std::time::Instant;
 use winit::event::VirtualKeyCode;
 
 use crate::drawable::Drawable;
@@ -8,7 +9,6 @@ use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
-use crate::primitives::position::Pose;
 use crate::primitives::vector::Vector3;
 use crate::WIDTH;
 
@@ -17,7 +17,12 @@ use crate::WIDTH;
 pub struct World {
     objects: Vec<Box<dyn Object>>,
     camera: Camera,
-    motion_model: MotionModel
+    /// The motion model is the class responsible for smoothly updating the position
+    motion_model: MotionModel,
+    /// Keep track for each time intervals to correctly update the motion model
+    last_time: Instant,
+    /// At each iteration, keep track whether a motion was applied
+    motion_applied: bool
 }
 
 impl World {
@@ -25,7 +30,9 @@ impl World {
         Self {
             objects: Vec::new(),
             camera,
-            motion_model: MotionModel::new()
+            motion_model: MotionModel::new(),
+            last_time: Instant::now(),
+            motion_applied: false
         }
     }
 
@@ -43,12 +50,7 @@ impl World {
 }
 
 impl Drawable for World {
-    fn update(&mut self) {
-        // Update is called at each iteration
-        self.camera.set_position(
-            self.motion_model.new_pos(self.camera.position().position(), 0.01)
-        );
-    }
+
 
     fn draw(&self, frame: &mut [u8]) {
         let mut faces2: Vec<CubicFace2> = Vec::new();
@@ -105,8 +107,8 @@ impl Drawable for World {
             //VirtualKeyCode::Down => self.camera.translate(&Vector3::new(-0.1, 0.0, 0.0)),
             //VirtualKeyCode::Right => self.camera.translate(&Vector3::new(0.0, 0.1, 0.0)),
             //VirtualKeyCode::Left => self.camera.translate(&Vector3::new(0.0, -0.1, 0.0)),
-            VirtualKeyCode::J => self.camera.translate(&Vector3::new(0.0, 0.0, -0.1)),
-            VirtualKeyCode::K => self.camera.translate(&Vector3::new(0.0, 0.0, 0.1)),
+            // VirtualKeyCode::J => self.camera.translate(&Vector3::new(0.0, 0.0, -0.1)),
+            // VirtualKeyCode::K => self.camera.translate(&Vector3::new(0.0, 0.0, 0.1)),
             VirtualKeyCode::R => {
                 for o in &mut self.objects {
                     o.rotate(std::f32::consts::PI / 16.);
@@ -122,10 +124,35 @@ impl Drawable for World {
     }
 
     fn key_held(&mut self, key: VirtualKeyCode) {
+        self.motion_applied = true;
         match key {
             VirtualKeyCode::Up => self.motion_model.apply(0, DEFAULT_ACC),
-            VirtualKeyCode::Down => self.motion_model.apply(0, DEFAULT_ACC),
+            VirtualKeyCode::Down => self.motion_model.apply(0, -DEFAULT_ACC),
+            VirtualKeyCode::Right => self.motion_model.apply(1, DEFAULT_ACC),
+            VirtualKeyCode::Left => self.motion_model.apply(1, -DEFAULT_ACC),
+            VirtualKeyCode::J => self.motion_model.apply(2, DEFAULT_ACC),
+            VirtualKeyCode::K => self.motion_model.apply(2, -DEFAULT_ACC),
             _ => {}
         }
+    }
+
+    /// Update is called at the end of each UI loop, right before rendering the screen
+    /// and calling the `draw` function.
+    fn update(&mut self) {
+        let elapsed = self.last_time.elapsed();
+        self.last_time = Instant::now();
+
+        // If no key was pressed, slow down the motion
+        if !self.motion_applied {
+            self.motion_model.slow_down();
+        }
+
+        // Update the camera position using the motion model
+        self.camera.set_position(
+            self.motion_model.new_pos(self.camera.position().position(), elapsed.as_secs_f32())
+        );
+
+        // reset the temporary variable
+        self.motion_applied = false;
     }
 }

@@ -40,7 +40,6 @@ impl Camera {
     }
 
     pub fn set_position(&mut self, position: Vector3) {
-        println!("new pos = {position:?}");
         self.pose.set_position(position);
     }
 
