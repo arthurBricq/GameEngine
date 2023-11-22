@@ -103,12 +103,6 @@ impl Drawable for World {
 
     fn key_pressed(&mut self, key: VirtualKeyCode) {
         match key {
-            //VirtualKeyCode::Up => self.camera.translate(&Vector3::new(0.1, 0.0, 0.0)),
-            //VirtualKeyCode::Down => self.camera.translate(&Vector3::new(-0.1, 0.0, 0.0)),
-            //VirtualKeyCode::Right => self.camera.translate(&Vector3::new(0.0, 0.1, 0.0)),
-            //VirtualKeyCode::Left => self.camera.translate(&Vector3::new(0.0, -0.1, 0.0)),
-            // VirtualKeyCode::J => self.camera.translate(&Vector3::new(0.0, 0.0, -0.1)),
-            // VirtualKeyCode::K => self.camera.translate(&Vector3::new(0.0, 0.0, 0.1)),
             VirtualKeyCode::R => {
                 for o in &mut self.objects {
                     o.rotate(std::f32::consts::PI / 16.);

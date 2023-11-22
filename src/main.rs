@@ -118,8 +118,6 @@ fn main() -> Result<(), Error> {
     let supported_keys_pressed = [
         VirtualKeyCode::R,
         VirtualKeyCode::E,
-        VirtualKeyCode::J,
-        VirtualKeyCode::K,
     ];
 
     let supported_keys_held = [
@@ -127,6 +125,8 @@ fn main() -> Result<(), Error> {
         VirtualKeyCode::Up,
         VirtualKeyCode::Left,
         VirtualKeyCode::Right,
+        VirtualKeyCode::J,
+        VirtualKeyCode::K,
     ];
 
     // UI loop

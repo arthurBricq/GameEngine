@@ -26,10 +26,12 @@ To express the rotation matrix $R$, one can simply write $R = [r1, r2, r3]$ wher
     - [x] raytracing
     - [x] overlapping objects
     - [ ] better user-interface
-      - [ ] acceleration
+      - [x] acceleration
       - [ ] block motion at objects : obstacle detection
       - [ ] handle rotation of the user
     - [ ] better way to create worlds : create a file format and a parser ?
+    - [ ] textures
+      - Since I already have implemented the raytracing logic, I must find a way to avoid unnecessary computation. But it will not be too difficult.
 
 When all of this is finished, we can start to implement doom 
 
