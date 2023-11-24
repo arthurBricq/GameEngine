@@ -4,8 +4,9 @@ use winit::event::VirtualKeyCode;
 use crate::drawable::Drawable;
 use crate::motion_model::{DEFAULT_ACC, MotionModel};
 use crate::primitives::camera::Camera;
+use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
-use crate::primitives::cubic_face2::CubicFace2;
+use crate::primitives::cubic_face2::{CubicFace2, ProjectionCoordinates};
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
@@ -49,12 +50,17 @@ impl World {
     }
 }
 
+impl World {
+    fn is_blocked_by_obstacle(&self) -> bool {
+        todo!("implement this method")
+    }
+}
+
 impl Drawable for World {
 
-
     fn draw(&self, frame: &mut [u8]) {
+        // Find the faces that are visible to the camera's perspective
         let mut faces2: Vec<CubicFace2> = Vec::new();
-
         for object in &self.objects {
             // Get the visible 3d faces
             let faces = object.get_visible_faces(&self.camera);
@@ -69,28 +75,29 @@ impl Drawable for World {
             let x = (i % WIDTH as usize) as i16;
             let y = (i / WIDTH as usize) as i16;
 
-            // Check if the point is contained in a face
-            let contained = faces2.iter().any(|face2| face2.contains(&Point2::new(x as f32, y as f32)));
-
-            // TODO : find the closest face intersecting with the ray
-
-            let closest_face = faces2
-                .iter()
-                .filter(|face2| face2.contains(&Point2::new(x as f32, y as f32)))
-                // .enumerate()
-                .min_by_key(|face2|
-                    if let Some(d) = face2.raytracing_distance(x, y, &self.camera) {
-                        (d * 1000.) as u32
-                    } else {
-                        std::u32::MAX
+            // For each pixel, find
+            // * the closest face
+            // * the coordinate (in the frame's reference) of the raytracing intersection
+            let mut min_distance = u32::MAX;
+            let mut best_projection: Option<ProjectionCoordinates> = None;
+            let mut best_face: Option<&CubicFace2> = None;
+            for f2 in &faces2 {
+                if f2.contains(&Point2::new(x as f32, y as f32)) {
+                    if let Some(projection) = f2.raytracing(x, y, &self.camera) {
+                        if projection.0 < min_distance {
+                            min_distance = projection.0;
+                            best_face = Some(f2);
+                            best_projection = Some(projection.1)
+                        }
                     }
-                );
+                }
+            }
 
             // find the first face of this point (if it exists)
-            let rgba = if let Some(face) = closest_face {
-                face.color().rgba()
+            let rgba = if let Some(face) = best_face {
+                face.color_at(&best_projection.unwrap()).rgba()
             } else {
-               [214, 214, 194, 150]
+                [214, 214, 194, 150]
             };
 
             pixel.copy_from_slice(&rgba);
@@ -135,6 +142,8 @@ impl Drawable for World {
     fn update(&mut self) {
         let elapsed = self.last_time.elapsed();
         self.last_time = Instant::now();
+
+        // Obstacle detection
 
         // If no key was pressed, slow down the motion
         if !self.motion_applied {

@@ -6,6 +6,32 @@ use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
 use crate::primitives::vector::Vector3;
 
+/// Contains the projected coordinates (alpha, beta) such that a point P belonging to
+/// a parallelogram can be written as
+///
+/// P = alpha * a + beta * b + P0
+///
+/// where
+/// * P0 = first point of the parallelogram
+/// * a = vector from P0 to P1
+/// * b = vector from P0 to P3
+#[derive(PartialEq, Debug)]
+pub struct ProjectionCoordinates {
+    alpha: f32,
+    beta: f32
+}
+
+impl ProjectionCoordinates {
+    pub fn new(alpha: f32, beta: f32) -> Self {
+        Self { alpha, beta }
+    }
+
+    pub fn none() -> Self {
+        Self {alpha: 0., beta: 0.}
+    }
+}
+
+
 /// A cubic face is an oriented square in space.
 ///
 /// A 2D face can hold a reference to its referring 3D face.
@@ -26,7 +52,12 @@ impl<'a> CubicFace2<'a> {
         Self { points, color, face3: Some(face) }
     }
 
+    // TODO remove this function once texture are implemented
     pub fn color(&self) -> &Color {
+        &self.color
+    }
+
+    pub fn color_at(&self, coordinates: &ProjectionCoordinates) -> &Color {
         &self.color
     }
 
@@ -54,9 +85,11 @@ impl<'a> CubicFace2<'a> {
         return (c1 == c2) && (c1 == c3) && (c1 == c4);
     }
 
-    /// Returns the raytraciing distance between the face and a ray defined as the pixels
-    /// of the camera's screen.
-    pub fn raytracing_distance(&self, u: i16, v: i16, camera: &Camera) -> Option<f32> {
+    /// Returns the raytraciing distance (in mm, as u32) between the face and a ray defined as the pixels
+    /// of the camera's screen, and the color of this pixel.
+    ///
+    /// Note: the distance is returned as u32 because f32 is not Orderable.
+    pub fn raytracing(&self, u: i16, v: i16, camera: &Camera) -> Option<(u32, ProjectionCoordinates)> {
         // Notation (*) means to be determined
         // C     = camera location
         // v     = ray's direction
@@ -86,12 +119,16 @@ impl<'a> CubicFace2<'a> {
                 let t = solution.z();
                 if t >= 0. && alpha >= 0. && alpha <= 1. && beta >= 0. && beta <= 1. {
                     // This means the intersection is on the plane
-                    return Some(t * v.norm());
+                    return Some((
+                        (t * v.norm() * 1000.) as u32,
+                        ProjectionCoordinates::new(alpha, beta)
+                    ));
                 }
             }
         };
         None
     }
+
 }
 
 #[cfg(test)]
@@ -147,7 +184,7 @@ mod tests {
 
     #[test]
     /// Test that the raytracing algorithm works well
-    fn raytracing_distance() {
+    fn raytracing() {
         // Create a camera
         let camera = Camera::new(
             Pose::new(Vector3::new(-2.0, 0., 0.), 0.0),
@@ -172,25 +209,22 @@ mod tests {
         let projection = face.projection(&camera);
         println!("Projection = {projection:?}");
 
-        let d1 = projection.raytracing_distance(100, 100, &camera);
-        assert_eq!(d1, Some(2.));
+        let d1 = projection.raytracing(100, 100, &camera);
+        let d1 = d1.unwrap().0;
+        assert_eq!(d1, 2000);
 
-        let d2 = projection.raytracing_distance(110, 100, &camera);
-        let d3 = projection.raytracing_distance(90, 100, &camera);
-        assert!(d2.unwrap() > d1.unwrap());
-        assert!(d3.unwrap() > d1.unwrap());
+        let d2 = projection.raytracing(110, 100, &camera);
+        let d3 = projection.raytracing(90, 100, &camera);
         assert_eq!(d2, d3);
+        assert!(d2.unwrap().0 > d1);
+        assert!(d3.unwrap().0 > d1);
 
-        let d4 = projection.raytracing_distance(100, 110, &camera);
-        let d5 = projection.raytracing_distance(100, 90, &camera);
-        assert!(d4.unwrap() > d1.unwrap());
-        assert!(d5.unwrap() > d1.unwrap());
+        let d4 = projection.raytracing(100, 110, &camera);
+        let d5 = projection.raytracing(100, 90, &camera);
         assert_eq!(d4, d5);
-        //
-        // println!("{d1:#?}");
-        // println!("{:#?}",  projection.raytracing_distance(110, 100, &camera));
-        // println!("{:#?}",  projection.raytracing_distance(90, 100, &camera));
-        // println!("{:#?}",  projection.raytracing_distance(100, 110, &camera));
-        // println!("{:#?}",  projection.raytracing_distance(100, 90, &camera));
+        assert!(d4.unwrap().0 > d1);
+        assert!(d5.unwrap().0 > d1);
+
+
     }
 }

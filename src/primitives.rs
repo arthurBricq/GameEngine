@@ -10,3 +10,4 @@ pub mod transformation;
 pub mod matrix3;
 pub mod color;
 pub mod object;
+pub mod textures;
