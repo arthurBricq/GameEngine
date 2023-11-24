@@ -4,6 +4,8 @@ use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
+use crate::primitives::textures::colored::ColoredTexture;
+use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
 /// Contains the projected coordinates (alpha, beta) such that a point P belonging to
@@ -37,8 +39,8 @@ impl ProjectionCoordinates {
 /// A 2D face can hold a reference to its referring 3D face.
 pub struct CubicFace2<'a> {
     points: [Point2; 4],
-    color: Color,
     face3: Option<&'a CubicFace3>,
+    texture: Box<dyn Texture>
 }
 
 impl<'a> Debug for CubicFace2<'a> {
@@ -49,16 +51,15 @@ impl<'a> Debug for CubicFace2<'a> {
 
 impl<'a> CubicFace2<'a> {
     pub fn new(points: [Point2; 4], color: Color, face: &'a CubicFace3) -> Self {
-        Self { points, color, face3: Some(face) }
-    }
-
-    // TODO remove this function once texture are implemented
-    pub fn color(&self) -> &Color {
-        &self.color
+        Self {
+            points,
+            face3: Some(face),
+            texture: Box::new(ColoredTexture::new(color))
+        }
     }
 
     pub fn color_at(&self, coordinates: &ProjectionCoordinates) -> &Color {
-        &self.color
+        &self.texture.color_at(0., 0.)
     }
 
     pub fn contains(&self, point: &Point2) -> bool {
