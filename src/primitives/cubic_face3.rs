@@ -6,6 +6,7 @@ use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
+use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
 /// A cubic face is an oriented square in space

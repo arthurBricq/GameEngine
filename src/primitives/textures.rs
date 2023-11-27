@@ -1,4 +1,5 @@
 pub mod colored;
+pub mod bw;
 
 use crate::primitives::color::Color;
 
@@ -7,10 +8,4 @@ pub trait Texture {
     fn width(&self) -> f32;
     fn height(&self) -> f32;
     fn color_at(&self, u: f32, v: f32) -> &Color;
-}
-
-
-/// A black and white texture
-pub struct BWTexture {
-
 }

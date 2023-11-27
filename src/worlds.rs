@@ -50,12 +50,6 @@ impl World {
     }
 }
 
-impl World {
-    fn is_blocked_by_obstacle(&self) -> bool {
-        todo!("implement this method")
-    }
-}
-
 impl Drawable for World {
 
     fn draw(&self, frame: &mut [u8]) {

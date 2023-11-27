@@ -95,19 +95,18 @@ fn main() -> Result<(), Error> {
      */
 
     world.add_face(
-        CubicFace3::create_simple_face(1.5, 0., 2., 2., 4., Color::red())
+        CubicFace3::create_simple_face(1.5, 0., 2., 4., 4., Color::red())
     );
-    world.add_face(
-        CubicFace3::create_simple_face(2.5, 0.5, 2., 2., 4., Color::orange())
-    );
-    world.add_face(
-        CubicFace3::create_simple_face(3.5, 1., 2., 2., 4., Color::light_green())
-    );
-    world.add_face(
-        CubicFace3::create_simple_face(4.5, 1.5, 2., 2., 4., Color::dark_blue())
-    );
-
-    world.add_cube(cube);
+    // world.add_face(
+    //     CubicFace3::create_simple_face(2.5, 0.5, 2., 2., 4., Color::orange())
+    // );
+    // world.add_face(
+    //     CubicFace3::create_simple_face(3.5, 1., 2., 2., 4., Color::light_green())
+    // );
+    // world.add_face(
+    //     CubicFace3::create_simple_face(4.5, 1.5, 2., 2., 4., Color::dark_blue())
+    // );
+    // world.add_cube(cube);
 
     // Sets the camera as looking at the object
     world.set_camera_position(Vector3::new(-2.0, 0.0, 0.0), );

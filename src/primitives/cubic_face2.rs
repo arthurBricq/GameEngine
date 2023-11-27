@@ -4,6 +4,7 @@ use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
+use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
@@ -31,16 +32,25 @@ impl ProjectionCoordinates {
     pub fn none() -> Self {
         Self {alpha: 0., beta: 0.}
     }
+
+    pub fn to_uv(&self, norm_a: f32, norm_b: f32) -> (f32, f32) {
+        (self.alpha * norm_a, self.beta * norm_b)
+    }
 }
 
 
 /// A cubic face is an oriented square in space.
 ///
-/// A 2D face can hold a reference to its referring 3D face.
+/// Internal properties:
+/// * face: A 2D face can hold a reference to its referring 3D face.
+/// * norm_a or b: the length of the side of the face. This is helpful to keep it in the class
+///   to avoid.
 pub struct CubicFace2<'a> {
     points: [Point2; 4],
+    texture: Box<dyn Texture>,
     face3: Option<&'a CubicFace3>,
-    texture: Box<dyn Texture>
+    norm_a: f32,
+    norm_b: f32,
 }
 
 impl<'a> Debug for CubicFace2<'a> {
@@ -50,16 +60,23 @@ impl<'a> Debug for CubicFace2<'a> {
 }
 
 impl<'a> CubicFace2<'a> {
-    pub fn new(points: [Point2; 4], color: Color, face: &'a CubicFace3) -> Self {
+    pub fn new(points2d: [Point2; 4], color: Color, face: &'a CubicFace3) -> Self {
+        let points = face.points();
+        let a = points[1] - points[0];
+        let b = points[3] - points[0];
         Self {
-            points,
+            points: points2d,
             face3: Some(face),
-            texture: Box::new(ColoredTexture::new(color))
+            // texture: Box::new(ColoredTexture::new(color)),
+            texture: Box::new(BWTexture::new(1.0, 1.0)),
+            norm_a: a.norm(),
+            norm_b: b.norm()
         }
     }
 
     pub fn color_at(&self, coordinates: &ProjectionCoordinates) -> &Color {
-        &self.texture.color_at(0., 0.)
+        let (u, v) = coordinates.to_uv(self.norm_a, self.norm_b);
+        &self.texture.color_at(u, v)
     }
 
     pub fn contains(&self, point: &Point2) -> bool {
@@ -130,6 +147,9 @@ impl<'a> CubicFace2<'a> {
         None
     }
 
+    pub fn set_texture(&mut self, texture: Box<dyn Texture>) {
+        self.texture = texture;
+    }
 }
 
 #[cfg(test)]
@@ -140,6 +160,7 @@ mod tests {
     use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::point::Point2;
     use crate::primitives::position::Pose;
+    use crate::primitives::textures::colored::ColoredTexture;
     use crate::primitives::vector::Vector3;
 
     #[test]
@@ -151,8 +172,10 @@ mod tests {
                 Point2::new(1., 1.),
                 Point2::new(0., 1.),
             ],
-            color: Color::purple(),
             face3: None,
+            texture: Box::new(ColoredTexture::new(Color::white())),
+            norm_a: 1.0,
+            norm_b: 1.0,
         };
 
         assert!(face2.contains(&Point2::new(0.5, 0.5)));
@@ -177,8 +200,10 @@ mod tests {
                 Point2::new(193.3, 53.3),
                 Point2::new(210., 20.),
             ],
-            color: Color::purple(),
+            texture: Box::new(ColoredTexture::new(Color::white())),
             face3: None,
+            norm_a: 1.0,
+            norm_b: 1.0,
         };
         assert!(face2.contains(&Point2::new(161., 21.)));
     }
