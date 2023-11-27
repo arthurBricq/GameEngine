@@ -45,7 +45,6 @@ impl ProjectionCoordinates {
 ///   to avoid.
 pub struct CubicFace2<'a> {
     points: [Point2; 4],
-    texture: &'a Box<dyn Texture>,
     face3: Option<&'a CubicFace3>,
     norm_a: f32,
     norm_b: f32,
@@ -58,14 +57,13 @@ impl<'a> Debug for CubicFace2<'a> {
 }
 
 impl<'a> CubicFace2<'a> {
-    pub fn new(points2d: [Point2; 4], texture: &'a Box<dyn Texture>, face: &'a CubicFace3) -> Self {
+    pub fn new(points2d: [Point2; 4], face: &'a CubicFace3) -> Self {
         let points = face.points();
         let a = points[1] - points[0];
         let b = points[3] - points[0];
         Self {
             points: points2d,
             face3: Some(face),
-            texture,
             norm_a: a.norm(),
             norm_b: b.norm()
         }
@@ -73,7 +71,7 @@ impl<'a> CubicFace2<'a> {
 
     pub fn color_at(&self, coordinates: &ProjectionCoordinates) -> &Color {
         let (u, v) = coordinates.to_uv(self.norm_a, self.norm_b);
-        &self.texture.color_at(u, v)
+        &self.face3.unwrap().texture().color_at(u, v)
     }
 
     pub fn contains(&self, point: &Point2) -> bool {
@@ -166,7 +164,6 @@ mod tests {
                 Point2::new(0., 1.),
             ],
             face3: None,
-            texture: Box::new(ColoredTexture::new(Color::white())),
             norm_a: 1.0,
             norm_b: 1.0,
         };
@@ -193,7 +190,6 @@ mod tests {
                 Point2::new(193.3, 53.3),
                 Point2::new(210., 20.),
             ],
-            texture: Box::new(ColoredTexture::new(Color::white())),
             face3: None,
             norm_a: 1.0,
             norm_b: 1.0,
@@ -221,7 +217,7 @@ mod tests {
                                      Vector3::new(x, y, z+4.),
                                  ],
                                  Vector3::new(-1., 0., 0.),
-                                 Color::yellow(),
+                                 Box::new(ColoredTexture::new(Color::dark_blue())),
         );
 
         // Now let's get serious
@@ -243,7 +239,5 @@ mod tests {
         assert_eq!(d4, d5);
         assert!(d4.unwrap().0 > d1);
         assert!(d5.unwrap().0 > d1);
-
-
     }
 }

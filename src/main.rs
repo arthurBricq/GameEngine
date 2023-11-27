@@ -15,6 +15,7 @@ use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::position::Pose;
 use crate::primitives::textures::bw::BWTexture;
+use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::vector::Vector3;
 
 use crate::worlds::World;
@@ -60,9 +61,9 @@ fn main() -> Result<(), Error> {
         Vector3::new(0.0, 0.0, 0.0),
         Vector3::new(1.0, 0.0, 0.0),
         false,
-        Color::purple(),
+        Box::new(ColoredTexture::new(Color::purple())),
     );
-    let cube = Cube3::from_face(bottom_face, 2.0);
+    let cube = Cube3::from_face(bottom_face, 2.0, Color::dark_blue());
 
     // Add some faces
     /*
@@ -114,7 +115,7 @@ fn main() -> Result<(), Error> {
     // world.add_face(
     //     CubicFace3::create_simple_face(4.5, 1.5, 2., 2., 4., Color::dark_blue())
     // );
-    // world.add_cube(cube);
+    world.add_cube(cube);
 
     // Sets the camera as looking at the object
     world.set_camera_position(Vector3::new(-2.0, 0.0, 0.0));

@@ -67,7 +67,7 @@ impl CubicFace3 {
 
     pub fn projection(&self, camera: &Camera) -> CubicFace2 {
         let points2 = self.points.map(|p| camera.project(p));
-        CubicFace2::new(points2, &self.texture, self)
+        CubicFace2::new(points2, self)
     }
 
     pub fn center(&self) -> Vector3 {

@@ -4,6 +4,7 @@ use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 
 use crate::primitives::position::Pose;
+use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::vector::Vector3;
 
 
@@ -16,7 +17,7 @@ pub struct Cube3 {
 
 impl Cube3 {
     /// Construct a cube from a bottom face with an extrusion above, strictly on the z-direction
-    pub fn from_face(bottom: CubicFace3, h: f32) -> Self {
+    pub fn from_face(bottom: CubicFace3, h: f32, c: Color) -> Self {
         // Construct the 4 points of the upper face
         let points = bottom.points();
 
@@ -30,13 +31,12 @@ impl Cube3 {
 
         // Construct the missing faces
         let n = bottom.normal();
-        let texture = bottom.texture();
-        let c = bottom.color();
-        let top = CubicFace3::new([p0, p1, p2, p3], n.opposite(), Color::black());
-        let f01 = CubicFace3::new([p0, p1, points[1], points[0]], p1 - p2, c.randomize_dimension(3));
-        let f12 = CubicFace3::new([p1, p2, points[2], points[1]], p1 - p0, c.randomize_dimension(3));
-        let f23 = CubicFace3::new([p2, p3, points[3], points[2]], p2 - p1, c.randomize_dimension(3));
-        let f30 = CubicFace3::new([p3, p0, points[0], points[3]], p0 - p1, c.randomize_dimension(3));
+
+        let top = CubicFace3::new([p0, p1, p2, p3], n.opposite(), Box::new(ColoredTexture::new(Color::black())));
+        let f01 = CubicFace3::new([p0, p1, points[1], points[0]], p1 - p2, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
+        let f12 = CubicFace3::new([p1, p2, points[2], points[1]], p1 - p0, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
+        let f23 = CubicFace3::new([p2, p3, points[3], points[2]], p2 - p1, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
+        let f30 = CubicFace3::new([p3, p0, points[0], points[3]], p0 - p1, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
 
         Self {
             faces: [bottom, top, f01, f12, f23, f30],
