@@ -1,13 +1,11 @@
 use std::fmt::{Debug, Formatter};
+
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
-use crate::primitives::textures::bw::BWTexture;
-use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::textures::Texture;
-use crate::primitives::vector::Vector3;
 
 /// Contains the projected coordinates (alpha, beta) such that a point P belonging to
 /// a parallelogram can be written as
@@ -47,7 +45,7 @@ impl ProjectionCoordinates {
 ///   to avoid.
 pub struct CubicFace2<'a> {
     points: [Point2; 4],
-    texture: Box<dyn Texture>,
+    texture: &'a Box<dyn Texture>,
     face3: Option<&'a CubicFace3>,
     norm_a: f32,
     norm_b: f32,
@@ -60,15 +58,14 @@ impl<'a> Debug for CubicFace2<'a> {
 }
 
 impl<'a> CubicFace2<'a> {
-    pub fn new(points2d: [Point2; 4], color: Color, face: &'a CubicFace3) -> Self {
+    pub fn new(points2d: [Point2; 4], texture: &'a Box<dyn Texture>, face: &'a CubicFace3) -> Self {
         let points = face.points();
         let a = points[1] - points[0];
         let b = points[3] - points[0];
         Self {
             points: points2d,
             face3: Some(face),
-            // texture: Box::new(ColoredTexture::new(color)),
-            texture: Box::new(BWTexture::new(1.0, 1.0)),
+            texture,
             norm_a: a.norm(),
             norm_b: b.norm()
         }
@@ -145,10 +142,6 @@ impl<'a> CubicFace2<'a> {
             }
         };
         None
-    }
-
-    pub fn set_texture(&mut self, texture: Box<dyn Texture>) {
-        self.texture = texture;
     }
 }
 

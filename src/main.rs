@@ -14,6 +14,7 @@ use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::position::Pose;
+use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::vector::Vector3;
 
 use crate::worlds::World;
@@ -59,7 +60,7 @@ fn main() -> Result<(), Error> {
         Vector3::new(0.0, 0.0, 0.0),
         Vector3::new(1.0, 0.0, 0.0),
         false,
-        Color::purple()
+        Color::purple(),
     );
     let cube = Cube3::from_face(bottom_face, 2.0);
 
@@ -95,7 +96,14 @@ fn main() -> Result<(), Error> {
      */
 
     world.add_face(
-        CubicFace3::create_simple_face(1.5, 0., 2., 4., 4., Color::red())
+        CubicFace3::create_simple_face(
+            1.5,
+            0.,
+            2.,
+            4.,
+            4.,
+            Box::new(BWTexture::new(0.5, 0.5))
+        )
     );
     // world.add_face(
     //     CubicFace3::create_simple_face(2.5, 0.5, 2., 2., 4., Color::orange())
@@ -109,7 +117,7 @@ fn main() -> Result<(), Error> {
     // world.add_cube(cube);
 
     // Sets the camera as looking at the object
-    world.set_camera_position(Vector3::new(-2.0, 0.0, 0.0), );
+    world.set_camera_position(Vector3::new(-2.0, 0.0, 0.0));
 
     // Parse the world as a drawable
     let mut world: Box<dyn Drawable> = Box::new(world);

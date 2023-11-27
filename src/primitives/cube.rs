@@ -30,6 +30,7 @@ impl Cube3 {
 
         // Construct the missing faces
         let n = bottom.normal();
+        let texture = bottom.texture();
         let c = bottom.color();
         let top = CubicFace3::new([p0, p1, p2, p3], n.opposite(), Color::black());
         let f01 = CubicFace3::new([p0, p1, points[1], points[0]], p1 - p2, c.randomize_dimension(3));

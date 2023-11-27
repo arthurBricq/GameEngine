@@ -1,11 +1,9 @@
 use std::fmt::{Debug, Formatter};
 
 use crate::primitives::camera::Camera;
-use crate::primitives::color::Color;
 use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
-use crate::primitives::point::Point2;
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
@@ -13,7 +11,7 @@ use crate::primitives::vector::Vector3;
 pub struct CubicFace3 {
     points: [Vector3; 4],
     normal: Vector3,
-    color: Color,
+    texture: Box<dyn Texture>,
 }
 
 impl Debug for CubicFace3 {
@@ -24,7 +22,7 @@ impl Debug for CubicFace3 {
 
 impl CubicFace3 {
     /// Creates an horizontal cubic face by extruding a 2D line
-    pub fn from_line(p1: Vector3, p2: Vector3, clockwise: bool, color: Color) -> Self {
+    pub fn from_line(p1: Vector3, p2: Vector3, clockwise: bool, texture: Box<dyn Texture>) -> Self {
         let v = p2 - p1;
         let rotated = if clockwise {
             v.clockwise()
@@ -36,12 +34,12 @@ impl CubicFace3 {
         Self {
             points: [p1, p2, p3, p4],
             normal: Vector3::new(0.0, 0.0, -1.0),
-            color,
+            texture,
         }
     }
 
     /// Creates a face pointing in the x direction
-    pub fn create_simple_face(x: f32, y: f32, z: f32, w: f32, h: f32, c: Color) -> Self {
+    pub fn create_simple_face(x: f32, y: f32, z: f32, w: f32, h: f32, texture: Box<dyn Texture>) -> Self {
         CubicFace3::new([
                             Vector3::new(x, y, z),
                             Vector3::new(x, y + w, z),
@@ -49,12 +47,12 @@ impl CubicFace3 {
                             Vector3::new(x, y, z - h),
                         ],
                         Vector3::new(-1., 0., -0.),
-                        c
+                        texture
         )
     }
 
-    pub fn new(points: [Vector3; 4], normal: Vector3, color: Color) -> Self {
-        Self { points, normal, color }
+    pub fn new(points: [Vector3; 4], normal: Vector3, texture: Box<dyn Texture>) -> Self {
+        Self { points, normal, texture }
     }
 
     pub fn points(&self) -> [Vector3; 4] {
@@ -65,13 +63,11 @@ impl CubicFace3 {
         &self.normal
     }
 
-    pub fn color(&self) -> &Color {
-        &self.color
-    }
+
 
     pub fn projection(&self, camera: &Camera) -> CubicFace2 {
         let points2 = self.points.map(|p| camera.project(p));
-        CubicFace2::new(points2, self.color.clone(), self)
+        CubicFace2::new(points2, &self.texture, self)
     }
 
     pub fn center(&self) -> Vector3 {
@@ -100,6 +96,9 @@ impl CubicFace3 {
             }
         }
         return false;
+    }
+    pub fn texture(&self) -> &Box<dyn Texture> {
+        &self.texture
     }
 }
 
