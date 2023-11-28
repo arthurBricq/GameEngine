@@ -87,15 +87,9 @@ impl CubicFace3 {
     }
 
     pub fn is_visible_from(&self, camera: &Camera) -> bool {
-        let dot1 = self.normal().dot(&camera.position().orientation());
         let cam_to_center = self.center() - *camera.position().position();
         let dot2 = self.normal().dot(&cam_to_center);
-        if dot1 <= 0.0 {
-            if dot2 < 0.0 {
-                return true;
-            }
-        }
-        return false;
+        dot2 < 0.0
     }
     pub fn texture(&self) -> &Box<dyn Texture> {
         &self.texture
@@ -117,5 +111,64 @@ impl Object for CubicFace3 {
     }
 }
 
+
+#[cfg(test)]
+mod tests {
+    use std::f32::consts::PI;
+    use crate::primitives::camera::Camera;
+    use crate::primitives::color::Color;
+    use crate::primitives::cubic_face3::CubicFace3;
+    use crate::primitives::position::Pose;
+    use crate::primitives::textures::colored::ColoredTexture;
+    use crate::primitives::vector::Vector3;
+
+    #[test]
+    fn visible_face_in_different_directions() {
+        // Create a camera
+        let mut camera = Camera::new(
+            Pose::new(Vector3::new(-2.0, 0., 0.), 0.0),
+            100.0, 100., 100.
+        );
+
+        // Create a cubic2 face facing the camera
+        let x: f32 = 0.;
+        let y: f32 = -2.;
+        let z: f32 = -2.;
+        let face = CubicFace3::new([
+                                       Vector3::new(x, y, z),
+                                       Vector3::new(x, y+4., z),
+                                       Vector3::new(x, y+4., z+4.),
+                                       Vector3::new(x, y, z+4.),
+                                   ],
+                                   Vector3::new(-1., 0., 0.),
+                                   Box::new(ColoredTexture::new(Color::dark_blue())),
+        );
+
+        // Initially the camera is looking in front
+        assert!(face.is_visible_from(&camera));
+
+        // Rotate the camera and it will look the other direction
+        camera.apply_z_rot(PI);
+        assert!(!face.is_visible_from(&camera));
+
+        // Rotate it again and the face is again visible
+        camera.apply_z_rot(PI);
+        assert!(face.is_visible_from(&camera));
+
+        // When performing small rotations, the face is still visible
+        camera.apply_z_rot(PI / 16.);
+        assert!(face.is_visible_from(&camera));
+        camera.apply_z_rot(PI / 16.);
+        assert!(face.is_visible_from(&camera));
+        camera.apply_z_rot(-PI / 16.);
+        assert!(face.is_visible_from(&camera));
+        camera.apply_z_rot(-PI / 16.);
+        assert!(face.is_visible_from(&camera));
+        camera.apply_z_rot(-PI / 16.);
+        assert!(face.is_visible_from(&camera));
+        camera.apply_z_rot(-PI / 16.);
+        assert!(face.is_visible_from(&camera));
+    }
+}
 
 

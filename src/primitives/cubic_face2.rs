@@ -114,19 +114,21 @@ impl<'a> CubicFace2<'a> {
         // where t, alpha and beta are real numbers
 
         if let Some(face) = self.face3 {
+            // * v is in the referential of the camera frame
+            // * c is in the referential of the world
             let v = camera.ray_direction(u, v);
-            let points = face.points();
             let c = *camera.position().position();
+            let points = face.points();
             let p = points[0];
             let a = points[1] - p;
             let b = points[3] - p;
-            let A = Matrix3::new(a.x(), b.x(), -v.x(),
-                                 a.y(), b.y(), -v.y(),
-                                 a.z(), b.z(), -v.z(),
+            let mat = Matrix3::new(a.x(), b.x(), -v.x(),
+                                   a.y(), b.y(), -v.y(),
+                                   a.z(), b.z(), -v.z(),
             );
             let rhs = c - p;
             // Solve the system
-            if let Some(solution) = A.linear_solve(rhs) {
+            if let Some(solution) = mat.linear_solve(rhs) {
                 let alpha = solution.x();
                 let beta = solution.y();
                 let t = solution.z();
@@ -228,16 +230,16 @@ mod tests {
         let d1 = d1.unwrap().0;
         assert_eq!(d1, 2000);
 
-        let d2 = projection.raytracing(110, 100, &camera);
-        let d3 = projection.raytracing(90, 100, &camera);
+        let d2 = projection.raytracing(110, 100, &camera).unwrap().0;
+        let d3 = projection.raytracing(90, 100, &camera).unwrap().0;
         assert_eq!(d2, d3);
-        assert!(d2.unwrap().0 > d1);
-        assert!(d3.unwrap().0 > d1);
+        assert!(d2 > d1);
+        assert!(d3 > d1);
 
-        let d4 = projection.raytracing(100, 110, &camera);
-        let d5 = projection.raytracing(100, 90, &camera);
+        let d4 = projection.raytracing(100, 110, &camera).unwrap().0;
+        let d5 = projection.raytracing(100, 90, &camera).unwrap().0;
         assert_eq!(d4, d5);
-        assert!(d4.unwrap().0 > d1);
-        assert!(d5.unwrap().0 > d1);
+        assert!(d4 > d1);
+        assert!(d5 > d1);
     }
 }

@@ -78,6 +78,8 @@ mod tests {
     use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::object::Object;
     use crate::primitives::position::Pose;
+    use crate::primitives::textures::bw::BWTexture;
+    use crate::primitives::textures::colored::ColoredTexture;
     use crate::primitives::vector::Vector3;
 
     fn cam(x: f32, y: f32, theta_z: f32) -> Camera {
@@ -96,11 +98,11 @@ mod tests {
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
             false,
-            Color::purple()
+            Box::new(ColoredTexture::new(Color::purple()))
         );
         println!("Bottom face = {bottom_face:?}");
 
-        let cube = Cube3::from_face(bottom_face, 2.0);
+        let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
         let cube: Box<dyn Object> = Box::new(cube);
 
         // when looking in the wrong direction, no face should be seen
@@ -133,6 +135,28 @@ mod tests {
         let faces = cube.get_visible_faces(&cam1);
         println!("{faces:#?}");
         assert_eq!(3, faces.len());
+    }
 
+    /// This test was created to solve a bug with side views of some cubes
+    #[test]
+    fn test_side_faces_with_rotated_camera() {
+        let bottom_face = CubicFace3::from_line(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(1.0, 0.0, 0.0),
+            false,
+            Box::new(ColoredTexture::new(Color::purple())),
+        );
+        let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+
+        let camera = Camera::new(
+                Pose::new(Vector3::new(-2.0, 2.5295, 0.0), 0.1963),
+                100.,
+                0.0,
+                0.0
+            );
+
+        println!("Cam orientation: {:?}", camera.orientation());
+
+        assert_eq!(cube.get_visible_faces(&camera).len(), 2);
     }
 }

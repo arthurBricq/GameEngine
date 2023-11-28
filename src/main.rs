@@ -63,38 +63,8 @@ fn main() -> Result<(), Error> {
         false,
         Box::new(ColoredTexture::new(Color::purple())),
     );
-    let cube = Cube3::from_face(bottom_face, 2.0, Color::dark_blue());
-
-    // Add some faces
-    /*
-    let x: f32 = 0.5;
-    let y: f32 = -1.5;
-    let z: f32 = 2.;
-    let f1 = CubicFace3::new([
-                                 Vector3::new(x, y, z),
-                                 Vector3::new(x+1., y, z),
-                                 Vector3::new(x+1., y+1.0, z),
-                                 Vector3::new(x, y+1.0, z),
-                             ],
-                             Vector3::new(0., 0., -1.),
-                             Color::dark_blue(),
-    );
-
-    let x: f32 = 1.5;
-    let y: f32 = -1.5;
-    let z: f32 = -1.;
-    let f2 = CubicFace3::new([
-                                 Vector3::new(x, y, z),
-                                 Vector3::new(x, y+1., z),
-                                 Vector3::new(x, y+1., z+3.),
-                                 Vector3::new(x, y, z+3.),
-                             ],
-                             Vector3::new(-1., 0., 0.),
-                             Color::yellow(),
-    );
-    world.add_face(f1);
-    world.add_face(f2);
-     */
+    let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+    world.add_cube(cube);
 
     world.add_face(
         CubicFace3::create_simple_face(
@@ -106,16 +76,6 @@ fn main() -> Result<(), Error> {
             Box::new(BWTexture::new(0.5, 0.5))
         )
     );
-    // world.add_face(
-    //     CubicFace3::create_simple_face(2.5, 0.5, 2., 2., 4., Color::orange())
-    // );
-    // world.add_face(
-    //     CubicFace3::create_simple_face(3.5, 1., 2., 2., 4., Color::light_green())
-    // );
-    // world.add_face(
-    //     CubicFace3::create_simple_face(4.5, 1.5, 2., 2., 4., Color::dark_blue())
-    // );
-    world.add_cube(cube);
 
     // Sets the camera as looking at the object
     world.set_camera_position(Vector3::new(-2.0, 0.0, 0.0));

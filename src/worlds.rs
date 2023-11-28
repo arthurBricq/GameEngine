@@ -23,7 +23,7 @@ pub struct World {
     /// Keep track for each time intervals to correctly update the motion model
     last_time: Instant,
     /// At each iteration, keep track whether a motion was applied
-    motion_applied: bool
+    motion_applied: bool,
 }
 
 impl World {
@@ -33,7 +33,7 @@ impl World {
             camera,
             motion_model: MotionModel::new(),
             last_time: Instant::now(),
-            motion_applied: false
+            motion_applied: false,
         }
     }
 
@@ -51,7 +51,6 @@ impl World {
 }
 
 impl Drawable for World {
-
     fn draw(&self, frame: &mut [u8]) {
         // Find the faces that are visible to the camera's perspective
         let mut faces2: Vec<CubicFace2> = Vec::new();
@@ -104,16 +103,12 @@ impl Drawable for World {
 
     fn key_pressed(&mut self, key: VirtualKeyCode) {
         match key {
-            VirtualKeyCode::R => {
-                for o in &mut self.objects {
-                    o.rotate(std::f32::consts::PI / 16.);
-                }
-            },
+            VirtualKeyCode::R => { // Rotate the camera's
+                self.camera.apply_z_rot(std::f32::consts::PI / 16.);
+            }
             VirtualKeyCode::E => {
-                for o in &mut self.objects {
-                    o.rotate(-std::f32::consts::PI / 16.);
-                }
-            },
+                self.camera.apply_z_rot(-std::f32::consts::PI / 16.);
+            }
             _ => {}
         }
     }
