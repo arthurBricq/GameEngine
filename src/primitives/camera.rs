@@ -43,16 +43,18 @@ impl Camera {
         self.pose.set_position(position);
     }
 
-    pub fn position(&self) -> &Pose {
+    pub fn translate(&mut self, by: &Vector3) {
+        self.pose.translate(by);
+    }
+
+    /// Some useful getters
+
+    pub fn pose(&self) -> &Pose {
         &self.pose
     }
 
     pub fn orientation(&self) -> Vector3 {
         self.pose.orientation()
-    }
-
-    pub fn translate(&mut self, by: &Vector3) {
-        self.pose.translate(by);
     }
 
     /// Returns a vector pointing in the direction of the ray directed by this pixel,

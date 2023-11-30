@@ -80,6 +80,12 @@ impl Vector3 {
         self.y /= n;
         self.z /= n;
     }
+
+    pub fn clamp(&mut self, min: f32, max: f32) {
+        self.x = self.x.clamp(min, max);
+        self.y = self.y.clamp(min, max);
+        self.z = self.z.clamp(min, max);
+    }
 }
 
 impl Add for Vector3 {
@@ -97,8 +103,8 @@ impl Add for Vector3 {
 impl AddAssign for Vector3 {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
-        self.y += rhs.x;
-        self.z += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
     }
 }
 

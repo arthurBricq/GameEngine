@@ -117,7 +117,7 @@ impl<'a> CubicFace2<'a> {
             // * v is in the referential of the camera frame
             // * c is in the referential of the world
             let v = camera.ray_direction(u, v);
-            let c = *camera.position().position();
+            let c = *camera.pose().position();
             let points = face.points();
             let p = points[0];
             let a = points[1] - p;

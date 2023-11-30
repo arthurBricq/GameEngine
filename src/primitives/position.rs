@@ -16,7 +16,7 @@ impl Pose {
     }
 
     pub fn orientation(&self) -> Vector3 {
-        Vector3::new(f32::cos(self.rotz), f32::sin(self.rotz), 0.0)
+        Vector3::new(f32::cos(self.rotz), -f32::sin(self.rotz), 0.0)
     }
 
     pub fn new(pos: Vector3, rotz: f32) -> Self {

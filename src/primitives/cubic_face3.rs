@@ -87,7 +87,7 @@ impl CubicFace3 {
     }
 
     pub fn is_visible_from(&self, camera: &Camera) -> bool {
-        let cam_to_center = self.center() - *camera.position().position();
+        let cam_to_center = self.center() - *camera.pose().position();
         let dot2 = self.normal().dot(&cam_to_center);
         dot2 < 0.0
     }
