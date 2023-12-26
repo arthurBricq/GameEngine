@@ -60,8 +60,9 @@ fn main() -> Result<(), Error> {
 
     let c = Color::purple();
 
-    for i in -5..5 {
-        for j in -5..5 {
+    let n = 5;
+    for i in -n..n {
+        for j in -n..n {
             let bottom_face = CubicFace3::from_line(
                 Vector3::new(2.*i as f32, 2.*j as f32, 0.0),
                 Vector3::new(2.*i as f32 + 1.0, 2.*j as f32, 0.0),
@@ -82,6 +83,7 @@ fn main() -> Result<(), Error> {
     // let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
     // world.add_cube(cube);
 
+    // textured face
     // world.add_face(
     //     CubicFace3::create_simple_face(
     //         1.5,
