@@ -1,3 +1,4 @@
+use std::time::Instant;
 use pixels::{Error, Pixels, SurfaceTexture};
 
 use winit::dpi::LogicalSize;
@@ -9,6 +10,7 @@ use winit_input_helper::WinitInputHelper;
 
 
 use crate::drawable::Drawable;
+use crate::fps::FPSMonitor;
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
@@ -25,6 +27,7 @@ mod drawable;
 mod primitives;
 mod worlds;
 mod motion_model;
+mod fps;
 
 pub const WIDTH: u32 = 320;
 pub const HEIGHT: u32 = 240;
@@ -54,11 +57,13 @@ fn main() -> Result<(), Error> {
         100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
     ));
 
+    let mut fps_monitor = FPSMonitor::new();
+
     // Create many cubes arranged as a sort of maze
     /*
     */
     let c = Color::purple();
-    let n = 1;
+    let n = 5;
     for i in -n..n {
         for j in -n..n {
             let bottom_face = CubicFace3::from_line(
@@ -123,6 +128,9 @@ fn main() -> Result<(), Error> {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
+
+            fps_monitor.add_frame(Instant::now());
+            fps_monitor.log_fps();
         }
 
         // Handle input events
@@ -166,6 +174,7 @@ fn main() -> Result<(), Error> {
             world.update();
             window.request_redraw();
         }
+
     });
 }
 
