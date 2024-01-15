@@ -54,13 +54,11 @@ fn main() -> Result<(), Error> {
         100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
     ));
 
-    // Create some 3D objects
+    // Create many cubes arranged as a sort of maze
     /*
     */
-
     let c = Color::purple();
-
-    let n = 5;
+    let n = 1;
     for i in -n..n {
         for j in -n..n {
             let bottom_face = CubicFace3::from_line(
@@ -73,7 +71,7 @@ fn main() -> Result<(), Error> {
             world.add_cube(cube);
         }
     }
-    //
+
     // let bottom_face = CubicFace3::from_line(
     //     Vector3::new(3.0, 0.0, 0.0),
     //     Vector3::new(4.0, 0.0, 0.0),
@@ -119,7 +117,7 @@ fn main() -> Result<(), Error> {
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            world.draw(pixels.frame_mut());
+            world.draw_painter(pixels.frame_mut());
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;

@@ -6,6 +6,7 @@ use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
 use crate::primitives::textures::Texture;
+use crate::WIDTH;
 
 /// Contains the projected coordinates (alpha, beta) such that a point P belonging to
 /// a parallelogram can be written as
@@ -69,11 +70,16 @@ impl<'a> CubicFace2<'a> {
         }
     }
 
-    pub fn color_at(&self, coordinates: &ProjectionCoordinates) -> &Color {
+    pub fn color_at_projection(&self, coordinates: &ProjectionCoordinates) -> &Color {
         let (u, v) = coordinates.to_uv(self.norm_a, self.norm_b);
         &self.face3.unwrap().texture().color_at(u, v)
     }
 
+    /// Returns true if the face contains the given point
+    ///
+    /// TODO I am sure this can be optimized. For instance, we could keep a set
+    ///      of all of the 2d pixels (it's a binary finite set) at creation of the
+    ///      face and then just lookup in this set.
     pub fn contains(&self, point: &Point2) -> bool {
         /// Returns true if the link between the points 'i' and 'j' has the `point` to
         /// its left.
@@ -98,7 +104,7 @@ impl<'a> CubicFace2<'a> {
         return (c1 == c2) && (c1 == c3) && (c1 == c4);
     }
 
-    /// Returns the raytraciing distance (in mm, as u32) between the face and a ray defined as the pixels
+    /// Returns the raytracing distance (in mm, as u32) between the face and a ray defined as the pixels
     /// of the camera's screen, and the color of this pixel.
     ///
     /// Note: the distance is returned as u32 because f32 is not Orderable.
@@ -142,6 +148,23 @@ impl<'a> CubicFace2<'a> {
             }
         };
         None
+    }
+
+    pub fn distance_to(&self, cam: &Camera) -> f32 {
+        self.face3.unwrap().distance_to(cam)
+    }
+
+    // Draws all of the pixels of self in the given frame
+    pub fn draw(&self, frame: &mut [u8]) {
+        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+            let x = (i % WIDTH as usize) as i16;
+            let y = (i / WIDTH as usize) as i16;
+            if self.contains(&Point2::new(x as f32, y as f32)) {
+                // TODO: compute the correct projection
+                let c = self.color_at_projection(&ProjectionCoordinates::new(0., 0.)).rgba();
+                pixel.copy_from_slice(&c);
+            }
+        }
     }
 }
 

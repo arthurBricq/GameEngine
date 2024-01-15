@@ -73,4 +73,8 @@ impl Drawable for BoxyWorld {
     fn key_held(&mut self, key: VirtualKeyCode) {
         todo!()
     }
+
+    fn draw_painter(&self, frame: &mut [u8]) {
+        todo!()
+    }
 }

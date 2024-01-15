@@ -39,7 +39,6 @@ impl MotionModel {
     }
 
     pub fn increment_direction(&mut self, axis: Vector3, inc: f32) {
-        println!("{axis:?}");
         self.acc += axis * inc;
         self.acc.clamp(-MAX_ACC, MAX_ACC)
     }

@@ -7,5 +7,7 @@ use crate::primitives::color::Color;
 pub trait Texture {
     fn width(&self) -> f32;
     fn height(&self) -> f32;
+    /// Returns the color at the provided pixel coordinates, where
+    /// u and v are expressed in the
     fn color_at(&self, u: f32, v: f32) -> &Color;
 }

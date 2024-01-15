@@ -51,6 +51,34 @@ impl World {
 }
 
 impl Drawable for World {
+    fn draw_painter(&self, frame: &mut [u8]) {
+        // Find the faces that are visible to the camera's perspective
+        let mut faces2: Vec<CubicFace2> = Vec::new();
+        for object in &self.objects {
+            let faces = object.get_visible_faces(&self.camera);
+            for face in faces {
+                let face2d = face.projection(&self.camera);
+                faces2.push(face2d);
+            }
+        }
+
+        // Sort the faces by depth, from the farthest polygon to the closest polygon
+        // The sorting iis done over i32, because f32 does not implements Ord.
+        faces2.sort_by_key(|f| (f.distance_to(&self.camera) * 1000.) as i32);
+
+        // Draw the background color
+        let background = [214, 214, 194, 150];
+        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+            let x = (i % WIDTH as usize) as i16;
+            let y = (i / WIDTH as usize) as i16;
+            pixel.copy_from_slice(&background);
+        }
+
+
+        // Paint the pixels, starting from the most distant ones
+        faces2.iter().rev().for_each(|f| f.draw(frame));
+    }
+
     fn draw(&self, frame: &mut [u8]) {
         // Find the faces that are visible to the camera's perspective
         let mut faces2: Vec<CubicFace2> = Vec::new();
@@ -88,7 +116,7 @@ impl Drawable for World {
 
             // find the first face of this point (if it exists)
             let rgba = if let Some(face) = best_face {
-                face.color_at(&best_projection.unwrap()).rgba()
+                face.color_at_projection(&best_projection.unwrap()).rgba()
             } else {
                 [214, 214, 194, 150]
             };

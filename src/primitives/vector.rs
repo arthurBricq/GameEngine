@@ -32,8 +32,37 @@ impl Vector3 {
     pub fn z(&self) -> f32 {
         self.z
     }
+
+    /// Returns the vector defined by:
+    ///    v = other - self
+    /// eg the vector going from self to other
+    pub fn line_to(&self, other: &Vector3) -> Vector3 {
+        Vector3 {
+            x: other.x - self.x,
+            y: other.y - self.y,
+            z: other.z - self.z
+        }
+    }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::primitives::vector::Vector3;
+
+    #[test]
+    fn test_line_to() {
+        let p0 = Vector3::new(0., 0., 0.);
+        let p1 = Vector3::new(1., 1., 1.);
+        let v01 = p0.line_to(&p1);
+        assert_eq!(v01.x, 1.0);
+        assert_eq!(v01.y, 1.0);
+        assert_eq!(v01.z, 1.0);
+        let v10 = p1.line_to(&p0);
+        assert_eq!(v10.x, -1.0);
+        assert_eq!(v10.y, -1.0);
+        assert_eq!(v10.z, -1.0);
+    }
+}
 /// Math operations
 
 impl Vector3 {

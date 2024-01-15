@@ -27,11 +27,18 @@ To express the rotation matrix $R$, one can simply write $R = [r1, r2, r3]$ wher
     - [x] overlapping objects
     - [ ] better user-interface
       - [x] acceleration
+      - [x] handle rotation of the user
       - [ ] block motion at objects : obstacle detection
-      - [ ] handle rotation of the user
     - [ ] better way to create worlds : create a file format and a parser ?
-    - [ ] textures
+    - [x] textures
       - Since I already have implemented the raytracing logic, I must find a way to avoid unnecessary computation. But it will not be too difficult.
 
-When all of this is finished, we can start to implement doom 
+- BSP (binary space partioning)
+  - It seems like I will need to have a **painter algorithm** instead of **raytracing**.
+    - raytracing works at the level of the pixel
+    - painter algorithm works at the level of the polygon
+      - [ ] distance from a point to a polygon
+> Your best bet is to iterate over all the lines and find the minimum distance from a point to a line segment. 
+
+When all of this is finished, we can start to implement doom !
 
