@@ -22,7 +22,6 @@ use crate::primitives::vector::Vector3;
 
 use crate::worlds::World;
 
-mod boxy_world;
 mod drawable;
 mod primitives;
 mod worlds;
@@ -57,11 +56,9 @@ fn main() -> Result<(), Error> {
         100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
     ));
 
-    let mut fps_monitor = FPSMonitor::new();
 
     // Create many cubes arranged as a sort of maze
     /*
-    */
     let c = Color::purple();
     let n = 5;
     for i in -n..n {
@@ -76,15 +73,16 @@ fn main() -> Result<(), Error> {
             world.add_cube(cube);
         }
     }
+    */
 
-    // let bottom_face = CubicFace3::from_line(
-    //     Vector3::new(3.0, 0.0, 0.0),
-    //     Vector3::new(4.0, 0.0, 0.0),
-    //     false,
-    //     Box::new(ColoredTexture::new(Color::yellow())),
-    // );
-    // let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
-    // world.add_cube(cube);
+    let bottom_face = CubicFace3::from_line(
+        Vector3::new(3.0, 0.0, 0.0),
+        Vector3::new(4.0, 0.0, 0.0),
+        false,
+        Box::new(ColoredTexture::new(Color::yellow())),
+    );
+    let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+    world.add_cube(cube);
 
     // textured face
     // world.add_face(
@@ -99,7 +97,9 @@ fn main() -> Result<(), Error> {
     // );
 
     // Sets the camera as looking at the object
-    world.set_camera_position(Vector3::new(-2.0, 0.0, 0.0));
+    world.set_camera_position(Vector3::new(-1.0, 0.0, 0.0));
+
+    let mut fps_monitor = FPSMonitor::new();
 
     // Parse the world as a drawable
     let mut world: Box<dyn Drawable> = Box::new(world);
