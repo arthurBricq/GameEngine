@@ -48,6 +48,10 @@ impl World {
     pub fn set_camera_position(&mut self, position: Vector3) {
         self.camera.set_position(position);
     }
+
+    pub fn camera(&self) -> &Camera {
+        &self.camera
+    }
 }
 
 impl Drawable for World {
@@ -58,9 +62,11 @@ impl Drawable for World {
             let faces = object.get_visible_faces(&self.camera);
             for face in faces {
                 let face2d = face.projection(&self.camera);
+                println!("face 2d = {face2d:?}");
                 faces2.push(face2d);
             }
         }
+        // println!("n={}", faces2.len());
 
         // Sort the faces by depth, from the farthest polygon to the closest polygon
         // The sorting iis done over i32, because f32 does not implements Ord.
@@ -73,7 +79,6 @@ impl Drawable for World {
             let y = (i / WIDTH as usize) as i16;
             pixel.copy_from_slice(&background);
         }
-
 
         // Paint the pixels, starting from the most distant ones
         faces2.iter().rev().for_each(|f| f.draw(frame));

@@ -159,4 +159,30 @@ mod tests {
 
         assert_eq!(cube.get_visible_faces(&camera).len(), 2);
     }
+
+    #[test]
+    fn test_painter_algorithm_problem() {
+        let bottom_face = CubicFace3::from_line(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(1.0, 0.0, 0.0),
+            false,
+            Box::new(ColoredTexture::new(Color::yellow())),
+        );
+        let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+
+        let camera = Camera::new(
+            Pose::new(Vector3::new(0.055, -0.562, 0.0), 0.0),
+            100.0, 320 as f32 / 2., 240 as f32 / 2.,
+        );
+
+        let faces = cube.get_visible_faces(&camera);
+
+        assert_eq!(1, faces.len());
+
+        let face = faces[0];
+        let f2 = face.projection(&camera);
+        println!("face 2d = {f2:?}");
+    }
+
 }
+

@@ -44,6 +44,25 @@ impl ProjectionCoordinates {
 /// * face: A 2D face can hold a reference to its referring 3D face.
 /// * norm_a or b: the length of the side of the face. This is helpful to keep it in the class
 ///   to avoid.
+///
+/// The coordinates of the Face2 (the image referential) are defined as
+///
+///             u
+///         ──────────►        IMAGE
+///
+///        ┌─────────────────────────────────┐
+///    │   │                                 │
+///    │   │                                 │
+/// v  │   │                                 │
+///    │   │                                 │
+///    │   │                                 │
+///    ▼   │         (u,v)                   │
+///        │                                 │
+///        │                                 │
+///        │                                 │
+///        │                                 │
+///        └─────────────────────────────────┘
+
 pub struct CubicFace2<'a> {
     points: [Point2; 4],
     face3: Option<&'a CubicFace3>,

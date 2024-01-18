@@ -25,13 +25,14 @@ impl Camera {
         // formula
         let transform = self.get_transform_world_to_cam();
         let point_in_cam_frame = transform.apply(point);
+        println!("cam frame: {point_in_cam_frame:?}");
         // Transform the point in pixels using the formula
         // https://en.wikipedia.org/wiki/Camera_matrix#Normalized_camera_matrix_and_normalized_image_coordinates
-        //
-        // In our case, the camera' forward direction
+        // In our case, the camera' forward direction is the x direction
+        // Note: don't forget to take the absolute value of x, to not mess up points that are behind the camera.
         Point2::new(
-            self.f * point_in_cam_frame.y() / point_in_cam_frame.x() + self.px,
-            self.f * point_in_cam_frame.z() / point_in_cam_frame.x() + self.py,
+            self.f * point_in_cam_frame.y() / point_in_cam_frame.x().abs() + self.px,
+            self.f * point_in_cam_frame.z() / point_in_cam_frame.x().abs() + self.py,
         )
     }
 

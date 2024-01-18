@@ -3,7 +3,7 @@ use pixels::{Error, Pixels, SurfaceTexture};
 
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
-use winit::event::VirtualKeyCode::C;
+use winit::event::VirtualKeyCode::{C, K};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
@@ -50,60 +50,6 @@ fn main() -> Result<(), Error> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
 
-    // Create a world with a standard camera
-    let mut world = World::new(Camera::new(
-        Pose::new(Vector3::empty(), 0.0),
-        100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
-    ));
-
-
-    // Create many cubes arranged as a sort of maze
-    /*
-    let c = Color::purple();
-    let n = 5;
-    for i in -n..n {
-        for j in -n..n {
-            let bottom_face = CubicFace3::from_line(
-                Vector3::new(2.*i as f32, 2.*j as f32, 0.0),
-                Vector3::new(2.*i as f32 + 1.0, 2.*j as f32, 0.0),
-                false,
-                Box::new(ColoredTexture::new(c.randomize_dimension(2))),
-            );
-            let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
-            world.add_cube(cube);
-        }
-    }
-    */
-
-    let bottom_face = CubicFace3::from_line(
-        Vector3::new(3.0, 0.0, 0.0),
-        Vector3::new(4.0, 0.0, 0.0),
-        false,
-        Box::new(ColoredTexture::new(Color::yellow())),
-    );
-    let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
-    world.add_cube(cube);
-
-    // textured face
-    // world.add_face(
-    //     CubicFace3::create_simple_face(
-    //         1.5,
-    //         0.,
-    //         2.,
-    //         4.,
-    //         4.,
-    //         Box::new(BWTexture::new(0.5, 0.5))
-    //     )
-    // );
-
-    // Sets the camera as looking at the object
-    world.set_camera_position(Vector3::new(-1.0, 0.0, 0.0));
-
-    let mut fps_monitor = FPSMonitor::new();
-
-    // Parse the world as a drawable
-    let mut world: Box<dyn Drawable> = Box::new(world);
-
     let supported_keys_pressed = [
         VirtualKeyCode::R,
         VirtualKeyCode::E,
@@ -118,11 +64,62 @@ fn main() -> Result<(), Error> {
         VirtualKeyCode::K,
     ];
 
-    // UI loop
+    // Create a world with a standard camera
+    let mut world = World::new(Camera::new(
+        Pose::new(
+            Vector3::new(0.055, -0.562, 0.0),
+            0.0),
+        100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
+    ));
+
+    // Create many cubes arranged as a sort of maze
+    /*
+    */
+    // let c = Color::purple();
+    // let n = 4;
+    // for i in -n..n {
+    //     for j in -n..n {
+    //         let bottom_face = CubicFace3::from_line(
+    //             Vector3::new(2.*i as f32, 2.*j as f32, 0.0),
+    //             Vector3::new(2.*i as f32 + 1.0, 2.*j as f32, 0.0),
+    //             false,
+    //             Box::new(ColoredTexture::new(c.randomize_dimension(2))),
+    //         );
+    //         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+    //         world.add_cube(cube);
+    //     }
+    // }
+
+    // let bottom_face = CubicFace3::from_line(
+    //     Vector3::new(0.0, 0.0, 0.0),
+    //     Vector3::new(1.0, 0.0, 0.0),
+    //     false,
+    //     Box::new(ColoredTexture::new(Color::yellow())),
+    // );
+    // let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+    // world.add_cube(cube);
+
+    // textured face
+    world.add_face(
+        CubicFace3::create_simple_face(
+            1.5,
+            0.,
+            2.,
+            10.,
+            4.,
+            Box::new(BWTexture::new(0.5, 0.5))
+        )
+    );
+
+    // Sets the camera as looking at the object
+    world.set_camera_position(Vector3::new(0.055, -0.562, 0.0));
+
+    let mut fps_monitor = FPSMonitor::new();
+    let mut use_fps_monitor = false;
+
     event_loop.run(move |event, _, control_flow| {
-        // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            world.draw_painter(pixels.frame_mut());
+            world.draw(pixels.frame_mut());
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;
@@ -130,7 +127,10 @@ fn main() -> Result<(), Error> {
             }
 
             fps_monitor.add_frame(Instant::now());
-            fps_monitor.log_fps();
+
+            if use_fps_monitor {
+                fps_monitor.log_fps();
+            }
         }
 
         // Handle input events
@@ -148,17 +148,25 @@ fn main() -> Result<(), Error> {
                 return;
             }
 
-            // Handle some keys
+            // Handle some keys to be sent to the world
             for key in supported_keys_pressed {
                 if input.key_pressed(key) {
                     world.key_pressed(key)
                 }
             }
-
             for key in supported_keys_held {
                 if input.key_held(key) {
                     world.key_held(key)
                 }
+            }
+
+            // Debug options
+            if input.key_pressed(VirtualKeyCode::F1) {
+                use_fps_monitor = !use_fps_monitor;
+                println!("Using FPS monitor = {use_fps_monitor}");
+            } else if input.key_pressed(VirtualKeyCode::F2) {
+                println!("Cam position = {:?}", world.camera().pose().position());
+                println!("Cam orientation = {:?}", world.camera().pose().orientation());
             }
 
             // Resize the window
