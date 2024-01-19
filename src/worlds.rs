@@ -1,5 +1,7 @@
 use std::time::Instant;
+use pixels::{Pixels, SurfaceTexture};
 use winit::event::VirtualKeyCode;
+use winit::window::Window;
 
 use crate::drawable::Drawable;
 use crate::motion_model::{MotionModel, DEFAULT_ACC};
@@ -11,7 +13,7 @@ use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
 use crate::primitives::vector::Vector3;
-use crate::WIDTH;
+use crate::{HEIGHT, WIDTH};
 
 /// Representation of the world in 3D coordinates
 /// A world simply contains several objects
@@ -51,6 +53,12 @@ impl World {
 
     pub fn camera(&self) -> &Camera {
         &self.camera
+    }
+
+    /// Debug function
+    pub fn save_current_image(&self) {
+        // TODO: look this up
+        // https://stackoverflow.com/a/38956995/13219173
     }
 }
 

@@ -23,6 +23,7 @@ mod fps;
 mod motion_model;
 mod primitives;
 mod worlds;
+mod png_saver;
 
 pub const WIDTH: u32 = 320;
 pub const HEIGHT: u32 = 240;
@@ -30,6 +31,7 @@ pub const HEIGHT: u32 = 240;
 fn main() -> Result<(), Error> {
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
+
     let window = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
