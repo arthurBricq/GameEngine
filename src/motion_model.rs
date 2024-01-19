@@ -5,12 +5,14 @@ const MIN_ACC: f32 = 10.;
 pub const DEFAULT_ACC: f32 = 100.;
 
 pub struct MotionModel {
-    acc: Vector3
+    acc: Vector3,
 }
 
 impl MotionModel {
     pub fn new() -> Self {
-        Self {acc: Vector3::empty()}
+        Self {
+            acc: Vector3::empty(),
+        }
     }
 
     /// Returns the position updated by the motion model
@@ -27,7 +29,11 @@ impl MotionModel {
 
     fn slow_down_axis(&mut self, axis: usize) {
         if self.acc[axis] > MIN_ACC {
-            let correction = if self.acc[axis] > 0. { -self.acc[axis] * 0.3 } else { self.acc[axis] * 0.3 };
+            let correction = if self.acc[axis] > 0. {
+                -self.acc[axis] * 0.3
+            } else {
+                self.acc[axis] * 0.3
+            };
             self.apply(axis, correction)
         } else {
             self.acc[axis] = 0.

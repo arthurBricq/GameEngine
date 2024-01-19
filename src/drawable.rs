@@ -19,5 +19,4 @@ pub trait Drawable {
 
     /// A key as held (maintaining press)
     fn key_held(&mut self, key: VirtualKeyCode);
-
 }

@@ -3,7 +3,7 @@ use crate::primitives::textures::Texture;
 
 /// A simple texture which onl displays 1 color
 pub struct ColoredTexture {
-    color: Color
+    color: Color,
 }
 
 impl ColoredTexture {

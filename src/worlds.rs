@@ -2,7 +2,7 @@ use std::time::Instant;
 use winit::event::VirtualKeyCode;
 
 use crate::drawable::Drawable;
-use crate::motion_model::{DEFAULT_ACC, MotionModel};
+use crate::motion_model::{MotionModel, DEFAULT_ACC};
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
@@ -136,7 +136,8 @@ impl Drawable for World {
 
     fn key_pressed(&mut self, key: VirtualKeyCode) {
         match key {
-            VirtualKeyCode::R => { // Rotate the camera's
+            VirtualKeyCode::R => {
+                // Rotate the camera's
                 self.camera.apply_z_rot(std::f32::consts::PI / 16.);
             }
             VirtualKeyCode::E => {
@@ -149,10 +150,18 @@ impl Drawable for World {
     fn key_held(&mut self, key: VirtualKeyCode) {
         self.motion_applied = true;
         match key {
-            VirtualKeyCode::Up => self.motion_model.increment_direction(self.camera.orientation(), DEFAULT_ACC),
-            VirtualKeyCode::Down => self.motion_model.increment_direction(self.camera.orientation().opposite(), DEFAULT_ACC),
-            VirtualKeyCode::Right => self.motion_model.increment_direction(self.camera.orientation().anticlockwise(), DEFAULT_ACC),
-            VirtualKeyCode::Left => self.motion_model.increment_direction(self.camera.orientation().clockwise(), DEFAULT_ACC),
+            VirtualKeyCode::Up => self
+                .motion_model
+                .increment_direction(self.camera.orientation(), DEFAULT_ACC),
+            VirtualKeyCode::Down => self
+                .motion_model
+                .increment_direction(self.camera.orientation().opposite(), DEFAULT_ACC),
+            VirtualKeyCode::Right => self
+                .motion_model
+                .increment_direction(self.camera.orientation().anticlockwise(), DEFAULT_ACC),
+            VirtualKeyCode::Left => self
+                .motion_model
+                .increment_direction(self.camera.orientation().clockwise(), DEFAULT_ACC),
             VirtualKeyCode::J => self.motion_model.apply(2, DEFAULT_ACC),
             VirtualKeyCode::K => self.motion_model.apply(2, -DEFAULT_ACC),
             _ => {}
@@ -174,7 +183,8 @@ impl Drawable for World {
 
         // Update the camera position using the motion model
         self.camera.set_position(
-            self.motion_model.new_pos(self.camera.pose().position(), elapsed.as_secs_f32())
+            self.motion_model
+                .new_pos(self.camera.pose().position(), elapsed.as_secs_f32()),
         );
 
         // reset the temporary variable

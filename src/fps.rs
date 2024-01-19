@@ -1,5 +1,5 @@
-use std::time::{Instant, SystemTime};
 use bounded_vec_deque::BoundedVecDeque;
+use std::time::{Instant, SystemTime};
 
 pub struct FPSMonitor {
     frames: BoundedVecDeque<f32>,
@@ -12,7 +12,7 @@ impl FPSMonitor {
         Self {
             frames: BoundedVecDeque::new(50),
             last_instant: None,
-            frame_count: 0
+            frame_count: 0,
         }
     }
 

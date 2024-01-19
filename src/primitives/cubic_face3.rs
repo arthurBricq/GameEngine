@@ -17,7 +17,11 @@ pub struct CubicFace3 {
 
 impl Debug for CubicFace3 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "points: {:?}, {:?}, {:?}, {:?} & normal = {:?}", self.points[0], self.points[1], self.points[2], self.points[3], self.normal)
+        write!(
+            f,
+            "points: {:?}, {:?}, {:?}, {:?} & normal = {:?}",
+            self.points[0], self.points[1], self.points[2], self.points[3], self.normal
+        )
     }
 }
 
@@ -25,7 +29,7 @@ impl CubicFace3 {
     /// Creates an horizontal cubic face by extruding a 2D line
     pub fn from_line(p1: Vector3, p2: Vector3, texture: Box<dyn Texture>) -> Self {
         let v = p2 - p1;
-        let rotated= v.anticlockwise();
+        let rotated = v.anticlockwise();
         let p3 = p2 + rotated;
         let p4 = p1 + rotated;
         Self {
@@ -36,20 +40,32 @@ impl CubicFace3 {
     }
 
     /// Creates a face pointing in the x direction
-    pub fn create_simple_face(x: f32, y: f32, z: f32, w: f32, h: f32, texture: Box<dyn Texture>) -> Self {
-        CubicFace3::new([
-                            Vector3::new(x, y, z),
-                            Vector3::new(x, y + w, z),
-                            Vector3::new(x, y + w, z - h),
-                            Vector3::new(x, y, z - h),
-                        ],
-                        Vector3::new(-1., 0., -0.),
-                        texture,
+    pub fn create_simple_face(
+        x: f32,
+        y: f32,
+        z: f32,
+        w: f32,
+        h: f32,
+        texture: Box<dyn Texture>,
+    ) -> Self {
+        CubicFace3::new(
+            [
+                Vector3::new(x, y, z),
+                Vector3::new(x, y + w, z),
+                Vector3::new(x, y + w, z - h),
+                Vector3::new(x, y, z - h),
+            ],
+            Vector3::new(-1., 0., -0.),
+            texture,
         )
     }
 
     pub fn new(points: [Vector3; 4], normal: Vector3, texture: Box<dyn Texture>) -> Self {
-        Self { points, normal, texture }
+        Self {
+            points,
+            normal,
+            texture,
+        }
     }
 
     pub fn points(&self) -> [Vector3; 4] {
@@ -94,9 +110,7 @@ impl CubicFace3 {
             return false;
         }
         // The face is visible if any of the points is visible as well.
-        for point in self.points {
-
-        }
+        for point in self.points {}
         return true;
     }
 
@@ -112,7 +126,17 @@ impl CubicFace3 {
         let mut d3 = distance_to_line(&self.points[2], &self.points[3], cam.pose().position());
         let mut d4 = distance_to_line(&self.points[3], &self.points[0], cam.pose().position());
         // since f64 does not implements Ord, we manually create a min of the 4 values
-        if d1 <= d2 && d1 <= d3 && d1 <= d4 { d1 } else if d2 <= d1 && d2 <= d3 && d2 <= d4 { d2 } else if d3 <= d1 && d3 <= d2 && d3 <= d4 { d3 } else if d4 <= d1 && d4 <= d2 && d4 <= d3 { d4 } else { d1 }
+        if d1 <= d2 && d1 <= d3 && d1 <= d4 {
+            d1
+        } else if d2 <= d1 && d2 <= d3 && d2 <= d4 {
+            d2
+        } else if d3 <= d1 && d3 <= d2 && d3 <= d4 {
+            d3
+        } else if d4 <= d1 && d4 <= d2 && d4 <= d3 {
+            d4
+        } else {
+            d1
+        }
     }
 }
 
@@ -150,37 +174,39 @@ impl Object for CubicFace3 {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::PI;
     use crate::primitives::camera::Camera;
     use crate::primitives::color::Color;
-    use crate::primitives::cubic_face3::{CubicFace3, distance_to_line};
+    use crate::primitives::cubic_face3::{distance_to_line, CubicFace3};
     use crate::primitives::position::Pose;
     use crate::primitives::textures::colored::ColoredTexture;
     use crate::primitives::vector::Vector3;
+    use std::f32::consts::PI;
 
     #[test]
     fn visible_face_in_different_directions() {
         // Create a camera
         let mut camera = Camera::new(
             Pose::new(Vector3::new(-2.0, 0., 0.), 0.0),
-            100.0, 100., 100.,
+            100.0,
+            100.,
+            100.,
         );
 
         // Create a cubic2 face facing the camera
         let x: f32 = 0.;
         let y: f32 = -2.;
         let z: f32 = -2.;
-        let face = CubicFace3::new([
-                                       Vector3::new(x, y, z),
-                                       Vector3::new(x, y + 4., z),
-                                       Vector3::new(x, y + 4., z + 4.),
-                                       Vector3::new(x, y, z + 4.),
-                                   ],
-                                   Vector3::new(-1., 0., 0.),
-                                   Box::new(ColoredTexture::new(Color::dark_blue())),
+        let face = CubicFace3::new(
+            [
+                Vector3::new(x, y, z),
+                Vector3::new(x, y + 4., z),
+                Vector3::new(x, y + 4., z + 4.),
+                Vector3::new(x, y, z + 4.),
+            ],
+            Vector3::new(-1., 0., 0.),
+            Box::new(ColoredTexture::new(Color::dark_blue())),
         );
 
         // Initially the camera is looking in front
@@ -223,25 +249,53 @@ mod tests {
         assert_near(0.0, distance_to_line(&p1, &p2, &p2));
 
         // Same for points on the line
-        assert_near(0.0, distance_to_line(&p1, &p2, &Vector3::new(0.0, 0.3, 0.0)));
-        assert_near(0.0, distance_to_line(&p1, &p2, &Vector3::new(0.0, 0.7, 0.0)));
+        assert_near(
+            0.0,
+            distance_to_line(&p1, &p2, &Vector3::new(0.0, 0.3, 0.0)),
+        );
+        assert_near(
+            0.0,
+            distance_to_line(&p1, &p2, &Vector3::new(0.0, 0.7, 0.0)),
+        );
 
         // Check points at the center on the sides
-        assert_near(0.5, distance_to_line(&p1, &p2, &Vector3::new(0.5, 0.0, 0.0)));
-        assert_near(0.5, distance_to_line(&p1, &p2, &Vector3::new(-0.5, 0.0, 0.0)));
+        assert_near(
+            0.5,
+            distance_to_line(&p1, &p2, &Vector3::new(0.5, 0.0, 0.0)),
+        );
+        assert_near(
+            0.5,
+            distance_to_line(&p1, &p2, &Vector3::new(-0.5, 0.0, 0.0)),
+        );
 
         // And at other altitudes
-        assert_near(0.5, distance_to_line(&p1, &p2, &Vector3::new(0.5, 0.2, 0.0)));
-        assert_near(0.5, distance_to_line(&p1, &p2, &Vector3::new(-0.5, 0.8, 0.0)));
+        assert_near(
+            0.5,
+            distance_to_line(&p1, &p2, &Vector3::new(0.5, 0.2, 0.0)),
+        );
+        assert_near(
+            0.5,
+            distance_to_line(&p1, &p2, &Vector3::new(-0.5, 0.8, 0.0)),
+        );
 
         // Bottom and top
-        assert_near(0.5, distance_to_line(&p1, &p2, &Vector3::new(0.0, 1.5, 0.0)));
-        assert_near(0.5, distance_to_line(&p1, &p2, &Vector3::new(0.0, -0.5, 0.0)));
+        assert_near(
+            0.5,
+            distance_to_line(&p1, &p2, &Vector3::new(0.0, 1.5, 0.0)),
+        );
+        assert_near(
+            0.5,
+            distance_to_line(&p1, &p2, &Vector3::new(0.0, -0.5, 0.0)),
+        );
 
         // Just a last few checks
-        assert_near(0.5 * f32::sqrt(2.), distance_to_line(&p1, &p2, &Vector3::new(0.5, 1.5, 0.0)));
-        assert_near(0.5 * f32::sqrt(2.), distance_to_line(&p1, &p2, &Vector3::new(-0.5, 1.5, 0.0)));
+        assert_near(
+            0.5 * f32::sqrt(2.),
+            distance_to_line(&p1, &p2, &Vector3::new(0.5, 1.5, 0.0)),
+        );
+        assert_near(
+            0.5 * f32::sqrt(2.),
+            distance_to_line(&p1, &p2, &Vector3::new(-0.5, 1.5, 0.0)),
+        );
     }
 }
-
-

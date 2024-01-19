@@ -1,6 +1,6 @@
+use crate::primitives::matrix3::Matrix3;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Sub};
-use crate::primitives::matrix3::Matrix3;
 
 /// A vector in 3 coordinates
 ///
@@ -19,11 +19,19 @@ impl Vector3 {
 
     /// Create a face from integers
     pub fn newi(x: i32, y: i32, z: i32) -> Self {
-        Self {x: x as f32, y: y as f32, z: z as f32}
+        Self {
+            x: x as f32,
+            y: y as f32,
+            z: z as f32,
+        }
     }
 
     pub fn empty() -> Self {
-        Self { x: 0.0, y: 0.0, z: 0.0 }
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
     }
 
     pub fn x(&self) -> f32 {
@@ -45,7 +53,7 @@ impl Vector3 {
         Vector3 {
             x: other.x - self.x,
             y: other.y - self.y,
-            z: other.z - self.z
+            z: other.z - self.z,
         }
     }
 }
@@ -71,7 +79,6 @@ mod tests {
 /// Math operations
 
 impl Vector3 {
-
     /// Dot product with another vector
     pub fn dot(&self, vec: &Vector3) -> f32 {
         self.x * vec.x + self.y * vec.y + self.z * vec.z
@@ -82,7 +89,7 @@ impl Vector3 {
         Self {
             x: -self.x,
             y: -self.y,
-            z: -self.z
+            z: -self.z,
         }
     }
 
@@ -91,7 +98,7 @@ impl Vector3 {
         Self {
             x: self.y,
             y: -self.x,
-            z: self.z
+            z: self.z,
         }
     }
 
@@ -100,7 +107,7 @@ impl Vector3 {
         Self {
             x: -self.y,
             y: self.x,
-            z: self.z
+            z: self.z,
         }
     }
 
@@ -198,7 +205,7 @@ impl Index<usize> for Vector3 {
             0 => &self.x,
             1 => &self.y,
             2 => &self.z,
-            _ => panic!("Index out of range")
+            _ => panic!("Index out of range"),
         }
     }
 }
@@ -209,7 +216,7 @@ impl IndexMut<usize> for Vector3 {
             0 => &mut self.x,
             1 => &mut self.y,
             2 => &mut self.z,
-            _ => panic!("Index out of range")
+            _ => panic!("Index out of range"),
         }
     }
 }

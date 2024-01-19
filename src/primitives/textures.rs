@@ -1,5 +1,5 @@
-pub mod colored;
 pub mod bw;
+pub mod colored;
 
 use crate::primitives::color::Color;
 

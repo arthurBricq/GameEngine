@@ -11,7 +11,10 @@ pub struct Transform {
 
 impl Transform {
     pub fn new(t: Vector3, R: Matrix3) -> Self {
-        Self { translation: t, rotation: R }
+        Self {
+            translation: t,
+            rotation: R,
+        }
     }
 
     pub fn apply(&self, vec: &Vector3) -> Vector3 {

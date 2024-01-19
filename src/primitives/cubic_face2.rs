@@ -20,7 +20,7 @@ use crate::WIDTH;
 #[derive(PartialEq, Debug)]
 pub struct ProjectionCoordinates {
     alpha: f32,
-    beta: f32
+    beta: f32,
 }
 
 impl ProjectionCoordinates {
@@ -29,14 +29,16 @@ impl ProjectionCoordinates {
     }
 
     pub fn none() -> Self {
-        Self {alpha: 0., beta: 0.}
+        Self {
+            alpha: 0.,
+            beta: 0.,
+        }
     }
 
     pub fn to_uv(&self, norm_a: f32, norm_b: f32) -> (f32, f32) {
         (self.alpha * norm_a, self.beta * norm_b)
     }
 }
-
 
 /// A cubic face is an oriented square in space.
 ///
@@ -72,7 +74,11 @@ pub struct CubicFace2<'a> {
 
 impl<'a> Debug for CubicFace2<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "points: {:?}, {:?}, {:?}, {:?} ", self.points[0], self.points[1], self.points[2], self.points[3])
+        write!(
+            f,
+            "points: {:?}, {:?}, {:?}, {:?} ",
+            self.points[0], self.points[1], self.points[2], self.points[3]
+        )
     }
 }
 
@@ -85,7 +91,7 @@ impl<'a> CubicFace2<'a> {
             points: points2d,
             face3: Some(face),
             norm_a: a.norm(),
-            norm_b: b.norm()
+            norm_b: b.norm(),
         }
     }
 
@@ -127,7 +133,12 @@ impl<'a> CubicFace2<'a> {
     /// of the camera's screen, and the color of this pixel.
     ///
     /// Note: the distance is returned as u32 because f32 is not Orderable.
-    pub fn raytracing(&self, u: i16, v: i16, camera: &Camera) -> Option<(u32, ProjectionCoordinates)> {
+    pub fn raytracing(
+        &self,
+        u: i16,
+        v: i16,
+        camera: &Camera,
+    ) -> Option<(u32, ProjectionCoordinates)> {
         // Notation (*) means to be determined
         // C     = camera location
         // v     = ray's direction
@@ -147,9 +158,16 @@ impl<'a> CubicFace2<'a> {
             let p = points[0];
             let a = points[1] - p;
             let b = points[3] - p;
-            let mat = Matrix3::new(a.x(), b.x(), -v.x(),
-                                   a.y(), b.y(), -v.y(),
-                                   a.z(), b.z(), -v.z(),
+            let mat = Matrix3::new(
+                a.x(),
+                b.x(),
+                -v.x(),
+                a.y(),
+                b.y(),
+                -v.y(),
+                a.z(),
+                b.z(),
+                -v.z(),
             );
             let rhs = c - p;
             // Solve the system
@@ -161,7 +179,7 @@ impl<'a> CubicFace2<'a> {
                     // This means the intersection is on the plane
                     return Some((
                         (t * v.norm() * 1000.) as u32,
-                        ProjectionCoordinates::new(alpha, beta)
+                        ProjectionCoordinates::new(alpha, beta),
                     ));
                 }
             }
@@ -180,7 +198,9 @@ impl<'a> CubicFace2<'a> {
             let y = (i / WIDTH as usize) as i16;
             if self.contains(&Point2::new(x as f32, y as f32)) {
                 // TODO: compute the correct projection
-                let c = self.color_at_projection(&ProjectionCoordinates::new(0., 0.)).rgba();
+                let c = self
+                    .color_at_projection(&ProjectionCoordinates::new(0., 0.))
+                    .rgba();
                 pixel.copy_from_slice(&c);
             }
         }
@@ -247,21 +267,24 @@ mod tests {
         // Create a camera
         let camera = Camera::new(
             Pose::new(Vector3::new(-2.0, 0., 0.), 0.0),
-            100.0, 100., 100.
+            100.0,
+            100.,
+            100.,
         );
 
         // Create a cubic2 face facing the camera
         let x: f32 = 0.;
         let y: f32 = -2.;
         let z: f32 = -2.;
-        let face = CubicFace3::new([
-                                     Vector3::new(x, y, z),
-                                     Vector3::new(x, y+4., z),
-                                     Vector3::new(x, y+4., z+4.),
-                                     Vector3::new(x, y, z+4.),
-                                 ],
-                                 Vector3::new(-1., 0., 0.),
-                                 Box::new(ColoredTexture::new(Color::dark_blue())),
+        let face = CubicFace3::new(
+            [
+                Vector3::new(x, y, z),
+                Vector3::new(x, y + 4., z),
+                Vector3::new(x, y + 4., z + 4.),
+                Vector3::new(x, y, z + 4.),
+            ],
+            Vector3::new(-1., 0., 0.),
+            Box::new(ColoredTexture::new(Color::dark_blue())),
         );
 
         // Now let's get serious

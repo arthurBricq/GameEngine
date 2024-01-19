@@ -4,7 +4,7 @@ use std::fmt::{Debug, Formatter};
 #[derive(Copy, Clone, PartialEq)]
 pub struct Point2 {
     x: f32,
-    y: f32
+    y: f32,
 }
 
 impl Point2 {

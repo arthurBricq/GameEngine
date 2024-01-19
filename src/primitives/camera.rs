@@ -14,7 +14,12 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(position: Pose, f: f32, px: f32, py: f32) -> Self {
-        Self { pose: position, f, px, py }
+        Self {
+            pose: position,
+            f,
+            px,
+            py,
+        }
     }
 
     /// Project the provided point (in world frame) into pixels
@@ -58,7 +63,12 @@ impl Camera {
     /// Returns a vector pointing in the direction of the ray directed by this pixel,
     /// in the camera frame
     pub fn ray_direction(&self, u: i16, v: i16) -> Vector3 {
-        self.get_rotation_cam_to_world() * Vector3::new(1.0, (u as f32 - self.px) / self.f, (v as f32 - self.py) / self.f)
+        self.get_rotation_cam_to_world()
+            * Vector3::new(
+                1.0,
+                (u as f32 - self.px) / self.f,
+                (v as f32 - self.py) / self.f,
+            )
     }
 
     pub fn is_point_visible(&self, point: &Vector3) -> bool {
@@ -70,8 +80,9 @@ impl Camera {
 impl Camera {
     /// Returns a 3D transform that maps points in the world coordinates into camera coordinates
     fn get_transform_world_to_cam(&self) -> Transform {
-        Transform::new(self.pose.position().opposite(),
-                       Matrix3::z_rotation(self.pose.rotation_z()),
+        Transform::new(
+            self.pose.position().opposite(),
+            Matrix3::z_rotation(self.pose.rotation_z()),
         )
     }
 
@@ -83,10 +94,10 @@ impl Camera {
 
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::PI;
     use crate::primitives::camera::Camera;
     use crate::primitives::position::Pose;
     use crate::primitives::vector::Vector3;
+    use std::f32::consts::PI;
 
     #[test]
     fn basic_projection() {
@@ -94,15 +105,7 @@ mod tests {
         let point_w = Vector3::empty();
 
         // Create a camera
-        let mut cam = Camera::new(
-            Pose::new(
-                Vector3::new(1.0, 0.0, 0.0),
-                0.0,
-            ),
-            1.0,
-            0.0,
-            0.0,
-        );
+        let mut cam = Camera::new(Pose::new(Vector3::new(1.0, 0.0, 0.0), 0.0), 1.0, 0.0, 0.0);
 
         // Compute the point in camera frame
         let transform = cam.get_transform_world_to_cam();

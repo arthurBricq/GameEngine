@@ -1,13 +1,12 @@
-use std::time::Instant;
 use pixels::{Error, Pixels, SurfaceTexture};
+use std::time::Instant;
 
 use winit::dpi::LogicalSize;
-use winit::event::{Event, VirtualKeyCode};
 use winit::event::VirtualKeyCode::{C, K};
+use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
-
 
 use crate::drawable::Drawable;
 use crate::fps::FPSMonitor;
@@ -23,10 +22,10 @@ use crate::primitives::vector::Vector3;
 use crate::worlds::World;
 
 mod drawable;
+mod fps;
+mod motion_model;
 mod primitives;
 mod worlds;
-mod motion_model;
-mod fps;
 
 pub const WIDTH: u32 = 320;
 pub const HEIGHT: u32 = 240;
@@ -50,10 +49,7 @@ fn main() -> Result<(), Error> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
 
-    let supported_keys_pressed = [
-        VirtualKeyCode::R,
-        VirtualKeyCode::E,
-    ];
+    let supported_keys_pressed = [VirtualKeyCode::R, VirtualKeyCode::E];
 
     let supported_keys_held = [
         VirtualKeyCode::Down,
@@ -66,15 +62,15 @@ fn main() -> Result<(), Error> {
 
     // Create a world with a standard camera
     let mut world = World::new(Camera::new(
-        Pose::new(
-            Vector3::new(0.055, -0.562, 0.0),
-            0.0),
-        100.0, WIDTH as f32 / 2., HEIGHT as f32 / 2.,
+        Pose::new(Vector3::new(0.055, -0.562, 0.0), 0.0),
+        100.0,
+        WIDTH as f32 / 2.,
+        HEIGHT as f32 / 2.,
     ));
 
     // Create many cubes arranged as a sort of maze
     /*
-    */
+     */
     // let c = Color::purple();
     // let n = 4;
     // for i in -n..n {
@@ -100,16 +96,14 @@ fn main() -> Result<(), Error> {
     // world.add_cube(cube);
 
     // textured face
-    world.add_face(
-        CubicFace3::create_simple_face(
-            1.5,
-            0.,
-            2.,
-            2.,
-            2.,
-            Box::new(BWTexture::new(0.5, 0.5))
-        )
-    );
+    world.add_face(CubicFace3::create_simple_face(
+        1.5,
+        0.,
+        2.,
+        2.,
+        2.,
+        Box::new(BWTexture::new(0.5, 0.5)),
+    ));
 
     // Sets the camera as looking at the object
     world.set_camera_position(Vector3::new(0.055, -0.562, 0.0));
@@ -166,7 +160,10 @@ fn main() -> Result<(), Error> {
                 println!("Using FPS monitor = {use_fps_monitor}");
             } else if input.key_pressed(VirtualKeyCode::F2) {
                 println!("Cam position = {:?}", world.camera().pose().position());
-                println!("Cam orientation = {:?}", world.camera().pose().orientation());
+                println!(
+                    "Cam orientation = {:?}",
+                    world.camera().pose().orientation()
+                );
             }
 
             // Resize the window
@@ -182,7 +179,6 @@ fn main() -> Result<(), Error> {
             world.update();
             window.request_redraw();
         }
-
     });
 }
 

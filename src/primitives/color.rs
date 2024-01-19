@@ -1,12 +1,12 @@
-use rand::thread_rng;
 use rand::distributions::{Distribution, Uniform};
+use rand::thread_rng;
 
 #[derive(Clone)]
 pub struct Color {
     r: u8,
     g: u8,
     b: u8,
-    a: u8
+    a: u8,
 }
 
 impl Color {
@@ -24,43 +24,93 @@ impl Color {
     }
 
     pub fn purple() -> Self {
-        Self {r: 255, g: 0, b: 255, a: 255}
+        Self {
+            r: 255,
+            g: 0,
+            b: 255,
+            a: 255,
+        }
     }
 
     pub fn yellow() -> Self {
-        Self {r: 255, g: 255, b: 0, a: 255}
+        Self {
+            r: 255,
+            g: 255,
+            b: 0,
+            a: 255,
+        }
     }
 
     pub fn dark_blue() -> Self {
-        Self {r: 0, g: 0, b: 153, a: 255}
+        Self {
+            r: 0,
+            g: 0,
+            b: 153,
+            a: 255,
+        }
     }
 
     pub fn red() -> Self {
-        Self {r: 255, g: 51, b: 51, a: 255}
+        Self {
+            r: 255,
+            g: 51,
+            b: 51,
+            a: 255,
+        }
     }
 
     pub fn orange() -> Self {
-        Self {r: 255, g: 153, b: 51, a: 255}
+        Self {
+            r: 255,
+            g: 153,
+            b: 51,
+            a: 255,
+        }
     }
 
     pub fn light_green() -> Self {
-        Self {r: 153, g: 255, b: 51, a: 255}
+        Self {
+            r: 153,
+            g: 255,
+            b: 51,
+            a: 255,
+        }
     }
 
     pub fn green() -> Self {
-        Self {r: 51, g: 255, b: 51, a: 255}
+        Self {
+            r: 51,
+            g: 255,
+            b: 51,
+            a: 255,
+        }
     }
 
     pub fn turquoise() -> Self {
-        Self {r: 102, g: 255, b: 255, a: 255}
+        Self {
+            r: 102,
+            g: 255,
+            b: 255,
+            a: 255,
+        }
     }
 
     pub fn white() -> Self {
-        Self {r: 0, g: 0, b: 0, a: 255}
+        Self {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 255,
+        }
     }
 
     pub fn black() -> Self {
-        Self {r: 255, g: 255, b: 255, a: 255}
+        Self {
+            r: 255,
+            g: 255,
+            b: 255,
+            a: 255,
+        }
     }
 
     // Randomize one of the axis of this color, between 0 and 255.
@@ -72,11 +122,31 @@ impl Color {
         // let i1 = between.sample(&mut rng) as u8;
         let x1 = between.sample(&mut rng);
         match axis {
-            0 => Self { r: x1, g: self.g, b: self.b, a: self.a},
-            1 => Self { r: self.r, g: x1, b: self.b, a: self.a},
-            2 => Self { r: self.r, g: self.g, b: x1, a: self.a},
-            3 => Self { r: self.r, g: self.g, b: self.b, a: x1},
-            _ => self.clone()
+            0 => Self {
+                r: x1,
+                g: self.g,
+                b: self.b,
+                a: self.a,
+            },
+            1 => Self {
+                r: self.r,
+                g: x1,
+                b: self.b,
+                a: self.a,
+            },
+            2 => Self {
+                r: self.r,
+                g: self.g,
+                b: x1,
+                a: self.a,
+            },
+            3 => Self {
+                r: self.r,
+                g: self.g,
+                b: self.b,
+                a: x1,
+            },
+            _ => self.clone(),
         }
     }
 

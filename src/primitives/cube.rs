@@ -6,7 +6,6 @@ use crate::primitives::object::Object;
 use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::vector::Vector3;
 
-
 /// A cube in 3D coordinates.
 /// The cube is defined by its faces. This is not the most lightweight representation of a cube,
 /// but it seems to fit the purposes better than using 8 points.
@@ -31,17 +30,36 @@ impl Cube3 {
         // Construct the missing faces
         let n = bottom.normal();
 
-        let top = CubicFace3::new([p0, p1, p2, p3], n.opposite(), Box::new(ColoredTexture::new(Color::black())));
-        let f01 = CubicFace3::new([p0, p1, points[1], points[0]], p1 - p2, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
-        let f12 = CubicFace3::new([p1, p2, points[2], points[1]], p1 - p0, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
-        let f23 = CubicFace3::new([p2, p3, points[3], points[2]], p2 - p1, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
-        let f30 = CubicFace3::new([p3, p0, points[0], points[3]], p0 - p1, Box::new(ColoredTexture::new(c.randomize_dimension(3))));
+        let top = CubicFace3::new(
+            [p0, p1, p2, p3],
+            n.opposite(),
+            Box::new(ColoredTexture::new(Color::black())),
+        );
+        let f01 = CubicFace3::new(
+            [p0, p1, points[1], points[0]],
+            p1 - p2,
+            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+        );
+        let f12 = CubicFace3::new(
+            [p1, p2, points[2], points[1]],
+            p1 - p0,
+            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+        );
+        let f23 = CubicFace3::new(
+            [p2, p3, points[3], points[2]],
+            p2 - p1,
+            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+        );
+        let f30 = CubicFace3::new(
+            [p3, p0, points[0], points[3]],
+            p0 - p1,
+            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+        );
 
         Self {
             faces: [bottom, top, f01, f12, f23, f30],
         }
     }
-
 }
 
 impl Object for Cube3 {
@@ -61,7 +79,7 @@ impl Object for Cube3 {
     }
 
     /// Rotate the rectangle by a provided angle
-   fn rotate(&mut self, by: f32) {
+    fn rotate(&mut self, by: f32) {
         for face in &mut self.faces {
             face.rotate(by);
         }
@@ -70,7 +88,6 @@ impl Object for Cube3 {
 
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::PI;
     use crate::primitives::camera::Camera;
     use crate::primitives::color::Color;
     use crate::primitives::cube::Cube3;
@@ -80,14 +97,10 @@ mod tests {
     use crate::primitives::textures::bw::BWTexture;
     use crate::primitives::textures::colored::ColoredTexture;
     use crate::primitives::vector::Vector3;
+    use std::f32::consts::PI;
 
     fn cam(x: f32, y: f32, theta_z: f32) -> Camera {
-        Camera::new(
-            Pose::new(Vector3::new(x, y, 0.0), theta_z),
-            100.,
-            0.0,
-            0.0
-        )
+        Camera::new(Pose::new(Vector3::new(x, y, 0.0), theta_z), 100., 0.0, 0.0)
     }
 
     #[test]
@@ -96,7 +109,7 @@ mod tests {
         let bottom_face = CubicFace3::from_line(
             Vector3::newi(0, 0, 0),
             Vector3::newi(1, 0, 0),
-            Box::new(ColoredTexture::new(Color::purple()))
+            Box::new(ColoredTexture::new(Color::purple())),
         );
 
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
@@ -145,11 +158,11 @@ mod tests {
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
 
         let camera = Camera::new(
-                Pose::new(Vector3::new(-2.0, 2.5295, 0.0), 0.1963),
-                100.,
-                0.0,
-                0.0
-            );
+            Pose::new(Vector3::new(-2.0, 2.5295, 0.0), 0.1963),
+            100.,
+            0.0,
+            0.0,
+        );
 
         println!("Cam orientation: {:?}", camera.orientation());
 
@@ -167,7 +180,9 @@ mod tests {
 
         let camera = Camera::new(
             Pose::new(Vector3::new(0.055, -0.562, 0.0), 0.0),
-            100.0, 320 as f32 / 2., 240 as f32 / 2.,
+            100.0,
+            320 as f32 / 2.,
+            240 as f32 / 2.,
         );
 
         let faces = cube.get_visible_faces(&camera);
@@ -178,6 +193,4 @@ mod tests {
         let f2 = face.projection(&camera);
         println!("face 2d = {f2:?}");
     }
-
 }
-
