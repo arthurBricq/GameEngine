@@ -170,7 +170,7 @@ mod tests {
     }
 
     #[test]
-    fn test_painter_algorithm_problem() {
+    fn test_painter_algorithm_problem_side() {
         let bottom_face = CubicFace3::from_line(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
@@ -186,11 +186,8 @@ mod tests {
         );
 
         let faces = cube.get_visible_faces(&camera);
-
         assert_eq!(1, faces.len());
-
-        let face = faces[0];
-        let f2 = face.projection(&camera);
-        println!("face 2d = {f2:?}");
     }
+
+
 }

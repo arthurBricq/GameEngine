@@ -62,11 +62,9 @@ impl Drawable for World {
             let faces = object.get_visible_faces(&self.camera);
             for face in faces {
                 let face2d = face.projection(&self.camera);
-                println!("face 2d = {face2d:?}");
                 faces2.push(face2d);
             }
         }
-        // println!("n={}", faces2.len());
 
         // Sort the faces by depth, from the farthest polygon to the closest polygon
         // The sorting iis done over i32, because f32 does not implements Ord.

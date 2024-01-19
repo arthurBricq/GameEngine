@@ -5,11 +5,18 @@ use std::fmt::{Debug, Formatter};
 pub struct Point2 {
     x: f32,
     y: f32,
+    /// A flag to precise if the point is behind or in front of the camera
+    in_front: Option<bool>
 }
 
 impl Point2 {
     pub fn new(x: f32, y: f32) -> Self {
-        Self { x, y }
+        Self {x, y, in_front: None}
+    }
+
+    /// Creates a point by precising if the point is in front or behind the camera.
+    pub fn new_with_direction(x: f32, y: f32, in_front: bool) -> Self {
+        Self {x, y, in_front: Some(in_front)}
     }
 
     pub fn x(&self) -> f32 {
@@ -18,6 +25,9 @@ impl Point2 {
 
     pub fn y(&self) -> f32 {
         self.y
+    }
+    pub fn in_front(&self) -> bool {
+        self.in_front.unwrap_or(true)
     }
 }
 

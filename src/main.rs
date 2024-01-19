@@ -1,8 +1,7 @@
-use pixels::{Error, Pixels, SurfaceTexture};
 use std::time::Instant;
 
+use pixels::{Error, Pixels, SurfaceTexture};
 use winit::dpi::LogicalSize;
-use winit::event::VirtualKeyCode::{C, K};
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
@@ -15,10 +14,8 @@ use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::position::Pose;
-use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::vector::Vector3;
-
 use crate::worlds::World;
 
 mod drawable;
@@ -86,24 +83,23 @@ fn main() -> Result<(), Error> {
     //     }
     // }
 
-    // let bottom_face = CubicFace3::from_line(
-    //     Vector3::new(0.0, 0.0, 0.0),
-    //     Vector3::new(1.0, 0.0, 0.0),
-    //     false,
-    //     Box::new(ColoredTexture::new(Color::yellow())),
-    // );
-    // let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
-    // world.add_cube(cube);
+    let bottom_face = CubicFace3::from_line(
+        Vector3::new(0.0, 0.0, 0.0),
+        Vector3::new(1.0, 0.0, 0.0),
+        Box::new(ColoredTexture::new(Color::yellow())),
+    );
+    let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+    world.add_cube(cube);
 
     // textured face
-    world.add_face(CubicFace3::create_simple_face(
-        1.5,
-        0.,
-        2.,
-        2.,
-        2.,
-        Box::new(BWTexture::new(0.5, 0.5)),
-    ));
+    // world.add_face(CubicFace3::create_simple_face(
+    //     1.5,
+    //     0.,
+    //     2.,
+    //     2.,
+    //     2.,
+    //     Box::new(BWTexture::new(0.5, 0.5)),
+    // ));
 
     // Sets the camera as looking at the object
     world.set_camera_position(Vector3::new(0.055, -0.562, 0.0));

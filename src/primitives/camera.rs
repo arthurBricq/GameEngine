@@ -1,3 +1,4 @@
+use crate::{HEIGHT, WIDTH};
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
 use crate::primitives::position::Pose;
@@ -34,9 +35,10 @@ impl Camera {
         // https://en.wikipedia.org/wiki/Camera_matrix#Normalized_camera_matrix_and_normalized_image_coordinates
         // In our case, the camera' forward direction is the x direction
         // Note: don't forget to take the absolute value of x, to not mess up points that are behind the camera.
-        Point2::new(
+        Point2::new_with_direction(
             self.f * point_in_cam_frame.y() / point_in_cam_frame.x().abs() + self.px,
             self.f * point_in_cam_frame.z() / point_in_cam_frame.x().abs() + self.py,
+            point_in_cam_frame.x() > 0.0
         )
     }
 
@@ -72,8 +74,8 @@ impl Camera {
     }
 
     pub fn is_point_visible(&self, point: &Vector3) -> bool {
-        // let uv = self.project(point);
-        true
+        let uv = self.project(point);
+        uv.in_front() && (uv.x() >= 0.0 || uv.x() < HEIGHT as f32) && (uv.y() >= 0.0 || uv.y() < WIDTH as f32)
     }
 }
 
