@@ -18,14 +18,13 @@ impl Camera {
     }
 
     /// Project the provided point (in world frame) into pixels
-    pub fn project(&self, point: Vector3) -> Point2 {
+    pub fn project(&self, point: &Vector3) -> Point2 {
         // point is in frame references
         // https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
         // We must transform `point` in the referential of the camera, and then apply the following
         // formula
         let transform = self.get_transform_world_to_cam();
         let point_in_cam_frame = transform.apply(point);
-        println!("cam frame: {point_in_cam_frame:?}");
         // Transform the point in pixels using the formula
         // https://en.wikipedia.org/wiki/Camera_matrix#Normalized_camera_matrix_and_normalized_image_coordinates
         // In our case, the camera' forward direction is the x direction
@@ -48,8 +47,6 @@ impl Camera {
         self.pose.translate(by);
     }
 
-    /// Some useful getters
-
     pub fn pose(&self) -> &Pose {
         &self.pose
     }
@@ -62,6 +59,11 @@ impl Camera {
     /// in the camera frame
     pub fn ray_direction(&self, u: i16, v: i16) -> Vector3 {
         self.get_rotation_cam_to_world() * Vector3::new(1.0, (u as f32 - self.px) / self.f, (v as f32 - self.py) / self.f)
+    }
+
+    pub fn is_point_visible(&self, point: &Vector3) -> bool {
+        // let uv = self.project(point);
+        true
     }
 }
 
@@ -104,7 +106,7 @@ mod tests {
 
         // Compute the point in camera frame
         let transform = cam.get_transform_world_to_cam();
-        let point_c = transform.apply(point_w);
+        let point_c = transform.apply(&point_w);
 
         // Compute the points in pixels
         println!("transform = {transform:?}");
@@ -113,11 +115,11 @@ mod tests {
         cam.apply_z_rot(PI);
 
         let transform = cam.get_transform_world_to_cam();
-        let point_c = transform.apply(point_w);
+        let point_c = transform.apply(&point_w);
         println!("transform = {transform:?}");
         println!("point in camera frame: {:?}", point_c);
 
-        let uv = cam.project(point_w);
+        let uv = cam.project(&point_w);
         println!("pixels: {uv:?}");
     }
 }

@@ -14,7 +14,7 @@ impl Transform {
         Self { translation: t, rotation: R }
     }
 
-    pub fn apply(&self, vec: Vector3) -> Vector3 {
-        self.rotation.clone() * (vec + self.translation)
+    pub fn apply(&self, vec: &Vector3) -> Vector3 {
+        self.rotation.clone() * (vec + &self.translation)
     }
 }

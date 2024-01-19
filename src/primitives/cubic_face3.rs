@@ -23,13 +23,9 @@ impl Debug for CubicFace3 {
 
 impl CubicFace3 {
     /// Creates an horizontal cubic face by extruding a 2D line
-    pub fn from_line(p1: Vector3, p2: Vector3, clockwise: bool, texture: Box<dyn Texture>) -> Self {
+    pub fn from_line(p1: Vector3, p2: Vector3, texture: Box<dyn Texture>) -> Self {
         let v = p2 - p1;
-        let rotated = if clockwise {
-            v.clockwise()
-        } else {
-            v.anticlockwise()
-        };
+        let rotated= v.anticlockwise();
         let p3 = p2 + rotated;
         let p4 = p1 + rotated;
         Self {
@@ -69,7 +65,7 @@ impl CubicFace3 {
     }
 
     pub fn projection(&self, camera: &Camera) -> CubicFace2 {
-        let points2 = self.points.map(|p| camera.project(p));
+        let points2 = self.points.map(|p| camera.project(&p));
         CubicFace2::new(points2, self)
     }
 
@@ -92,7 +88,16 @@ impl CubicFace3 {
     pub fn is_visible_from(&self, camera: &Camera) -> bool {
         let cam_to_center = self.center() - *camera.pose().position();
         let dot2 = self.normal().dot(&cam_to_center);
-        dot2 < 0.0
+        if dot2 < 0.0 {
+            // if the normal of the face and the vector going to the face are opposed, then
+            // the face is not visible
+            return false;
+        }
+        // The face is visible if any of the points is visible as well.
+        for point in self.points {
+
+        }
+        return true;
     }
 
     /// Returns the closest distance from the camera to any of the line defining

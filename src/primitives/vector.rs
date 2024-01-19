@@ -17,6 +17,11 @@ impl Vector3 {
         Self { x, y, z }
     }
 
+    /// Create a face from integers
+    pub fn newi(x: i32, y: i32, z: i32) -> Self {
+        Self {x: x as f32, y: y as f32, z: z as f32}
+    }
+
     pub fn empty() -> Self {
         Self { x: 0.0, y: 0.0, z: 0.0 }
     }
@@ -122,6 +127,18 @@ impl Add for Vector3 {
 
     fn add(self, rhs: Self) -> Self::Output {
         Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        }
+    }
+}
+
+impl Add for &Vector3 {
+    type Output = Vector3;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Vector3 {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
             z: self.z + rhs.z,

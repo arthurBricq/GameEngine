@@ -3,7 +3,6 @@ use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 
-use crate::primitives::position::Pose;
 use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::vector::Vector3;
 
@@ -95,12 +94,10 @@ mod tests {
     fn visible_faces() {
         // Create a cube
         let bottom_face = CubicFace3::from_line(
-            Vector3::new(0.0, 0.0, 0.0),
-            Vector3::new(1.0, 0.0, 0.0),
-            false,
+            Vector3::newi(0, 0, 0),
+            Vector3::newi(1, 0, 0),
             Box::new(ColoredTexture::new(Color::purple()))
         );
-        println!("Bottom face = {bottom_face:?}");
 
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
         let cube: Box<dyn Object> = Box::new(cube);
@@ -143,7 +140,6 @@ mod tests {
         let bottom_face = CubicFace3::from_line(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
-            false,
             Box::new(ColoredTexture::new(Color::purple())),
         );
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
@@ -165,7 +161,6 @@ mod tests {
         let bottom_face = CubicFace3::from_line(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
-            false,
             Box::new(ColoredTexture::new(Color::yellow())),
         );
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());

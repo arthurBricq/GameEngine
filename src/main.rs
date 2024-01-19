@@ -105,8 +105,8 @@ fn main() -> Result<(), Error> {
             1.5,
             0.,
             2.,
-            10.,
-            4.,
+            2.,
+            2.,
             Box::new(BWTexture::new(0.5, 0.5))
         )
     );
@@ -119,7 +119,7 @@ fn main() -> Result<(), Error> {
 
     event_loop.run(move |event, _, control_flow| {
         if let Event::RedrawRequested(_) = event {
-            world.draw(pixels.frame_mut());
+            world.draw_painter(pixels.frame_mut());
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;
