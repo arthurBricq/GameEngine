@@ -38,6 +38,12 @@ impl ProjectionCoordinates {
     pub fn to_uv(&self, norm_a: f32, norm_b: f32) -> (f32, f32) {
         (self.alpha * norm_a, self.beta * norm_b)
     }
+    pub fn alpha(&self) -> f32 {
+        self.alpha
+    }
+    pub fn beta(&self) -> f32 {
+        self.beta
+    }
 }
 
 /// A cubic face is an oriented square in space.
@@ -139,50 +145,13 @@ impl<'a> CubicFace2<'a> {
         v: i16,
         camera: &Camera,
     ) -> Option<(u32, ProjectionCoordinates)> {
-        // Notation (*) means to be determined
-        // C     = camera location
-        // v     = ray's direction
-        // P     = One corner of the 3D face
-        // a & b = vectors from P to the adjacent corners of the face
-        //
-        // Equation to solve
-        // C + t * v = P + alpha * a + beta * b
-        // where t, alpha and beta are real numbers
 
         if let Some(face) = self.face3 {
             // * v is in the referential of the camera frame
             // * c is in the referential of the world
-            let v = camera.ray_direction(u, v);
+            let direction = camera.ray_direction(u, v);
             let c = *camera.pose().position();
-            let points = face.points();
-            let p = points[0];
-            let a = points[1] - p;
-            let b = points[3] - p;
-            let mat = Matrix3::new(
-                a.x(),
-                b.x(),
-                -v.x(),
-                a.y(),
-                b.y(),
-                -v.y(),
-                a.z(),
-                b.z(),
-                -v.z(),
-            );
-            let rhs = c - p;
-            // Solve the system
-            if let Some(solution) = mat.linear_solve(rhs) {
-                let alpha = solution.x();
-                let beta = solution.y();
-                let t = solution.z();
-                if t >= 0. && alpha >= 0. && alpha <= 1. && beta >= 0. && beta <= 1. {
-                    // This means the intersection is on the plane
-                    return Some((
-                        (t * v.norm() * 1000.) as u32,
-                        ProjectionCoordinates::new(alpha, beta),
-                    ));
-                }
-            }
+            return face.line_projection(&c, &direction);
         };
         None
     }

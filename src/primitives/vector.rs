@@ -153,6 +153,31 @@ impl Add for &Vector3 {
     }
 }
 
+impl Sub for Vector3 {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
+    }
+}
+
+impl Sub for &Vector3 {
+    type Output = Vector3;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vector3 {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
+    }
+}
+
+
 impl AddAssign for Vector3 {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
@@ -173,17 +198,6 @@ impl Mul<f32> for Vector3 {
     }
 }
 
-impl Sub for Vector3 {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-            z: self.z - rhs.z,
-        }
-    }
-}
 
 impl Div<f32> for Vector3 {
     type Output = Vector3;

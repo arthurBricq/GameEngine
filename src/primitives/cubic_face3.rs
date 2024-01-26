@@ -3,7 +3,7 @@ use std::fmt::{Debug, Formatter};
 
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
-use crate::primitives::cubic_face2::CubicFace2;
+use crate::primitives::cubic_face2::{CubicFace2, ProjectionCoordinates};
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
 use crate::primitives::textures::bw::BWTexture;
@@ -148,6 +148,79 @@ impl CubicFace3 {
         } else {
             d1
         }
+    }
+
+    /// Returns the base associated with this face used for computing intersections.
+    /// See the functions where this is used for self-contained documentation.
+    ///
+    /// returns (x, y, P)
+    /// x: axis 1
+    /// y: axis 2
+    /// P: anchor
+    fn get_projective_base(&self) -> (Vector3, Vector3, Vector3) {
+        let points = self.points();
+        let p = points[0];
+        (points[1] - p, points[3] - p, p)
+    }
+
+    /// Computes the intersection between a line and self.
+    ///
+    /// The line is defined by:
+    /// * a starting point 'c' (stands for camera, in the use-case of raytracing)
+    /// * a direction vector 'v'
+    ///
+    pub fn line_projection(&self, c: &Vector3, direction: &Vector3) -> Option<(u32, ProjectionCoordinates)> {
+        // Notation (*) means to be determined
+        // C     = camera location
+        // direction     = ray's direction
+        // p     = One corner of the 3D face
+        // a & b = vectors from P to the adjacent corners of the face
+
+        // Equation to solve
+        // C + t * v = P + alpha * a + beta * b
+        // where t, alpha and beta are real numbers
+        //
+        // To solve this equation, we use a matrix system that we
+        // invert.
+        let points = self.points();
+        let (a, b, p) = self.get_projective_base();
+        let mat = Matrix3::new(
+            a.x(),
+            b.x(),
+            -direction.x(),
+            a.y(),
+            b.y(),
+            -direction.y(),
+            a.z(),
+            b.z(),
+            -direction.z(),
+        );
+        let rhs = c - &p;
+        // Solve the system
+        if let Some(solution) = mat.linear_solve(rhs) {
+            let alpha = solution.x();
+            let beta = solution.y();
+            let t = solution.z();
+            if t >= 0. && alpha >= 0. && alpha <= 1. && beta >= 0. && beta <= 1. {
+                // This means the intersection is on the plane
+                return Some((
+                    (t * direction.norm() * 1000.) as u32,
+                    ProjectionCoordinates::new(alpha, beta),
+                ));
+            }
+        }
+
+        return None;
+    }
+
+    /// Returns the intersection between the line from p1 to p2 and self
+    pub fn line_intersection(&self, p1: &Vector3, p2: &Vector3) -> Option<Vector3> {
+        let dir = p1.line_to(p2);
+        if let Some((dist, projection)) = self.line_projection(p1, &dir) {
+            let (a, b, _p) = self.get_projective_base();
+            return Some(a * projection.alpha() + b * projection.beta());
+        }
+        return None
     }
 }
 

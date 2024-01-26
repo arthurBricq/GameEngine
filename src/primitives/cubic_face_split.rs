@@ -23,6 +23,8 @@ fn point_in_front_of(face: &CubicFace3, point: &Vector3) -> bool {
     to_center.dot(face.normal()) > 0.0
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use crate::primitives::cubic_face3::CubicFace3;
@@ -55,6 +57,15 @@ mod tests {
         assert!(!point_in_front_of(&f, &Vector3::newi(-3, -3, 0)));
         assert!(!point_in_front_of(&f, &Vector3::newi(-4, -4, 0)));
     }
+
+    #[test]
+    fn test_line_intersection_with_place() {
+        let f = CubicFace3::vface_from_line(Vector3::newi(0,0,0), Vector3::newi(1,0,0));
+        let tmp = f.line_intersection(&Vector3::new(0.5, -1.0, 0.0), &Vector3::new(0.5, 1.0, 0.0));
+        assert!(tmp.is_some());
+        assert_eq!(tmp.unwrap(), Vector3::new(0.5, 0.0, 0.0));
+    }
+
     #[test]
     fn bsp_polygon_splitting() {}
 }
