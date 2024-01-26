@@ -70,29 +70,28 @@ fn main() -> Result<(), Error> {
     // Create many cubes arranged as a sort of maze
     /*
      */
-    // let c = Color::purple();
-    // let n = 4;
-    // for i in -n..n {
-    //     for j in -n..n {
-    //         let bottom_face = CubicFace3::from_line(
-    //             Vector3::new(2.*i as f32, 2.*j as f32, 0.0),
-    //             Vector3::new(2.*i as f32 + 1.0, 2.*j as f32, 0.0),
-    //             false,
-    //             Box::new(ColoredTexture::new(c.randomize_dimension(2))),
-    //         );
-    //         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
-    //         world.add_cube(cube);
-    //     }
-    // }
+    let c = Color::purple();
+    let n = 4;
+    for i in -n..n {
+        for j in -n..n {
+            let bottom_face = CubicFace3::hface_from_line(
+                Vector3::new(2.*i as f32, 2.*j as f32, 0.0),
+                Vector3::new(2.*i as f32 + 1.0, 2.*j as f32, 0.0),
+                Box::new(ColoredTexture::new(c.randomize_dimension(2))),
+            );
+            let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+            world.add_cube(cube);
+        }
+    }
 
-    let bottom_face = CubicFace3::from_line(
-        Vector3::new(0.0, 0.0, 0.0),
-        Vector3::new(1.0, 0.0, 0.0),
-        Box::new(ColoredTexture::new(Color::yellow())),
-    );
-    let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
-    world.add_cube(cube);
-
+    // let bottom_face = CubicFace3::from_line(
+    //     Vector3::new(0.0, 0.0, 0.0),
+    //     Vector3::new(1.0, 0.0, 0.0),
+    //     Box::new(ColoredTexture::new(Color::yellow())),
+    // );
+    // let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+    // world.add_cube(cube);
+    //
     // textured face
     // world.add_face(CubicFace3::create_simple_face(
     //     1.5,
@@ -111,7 +110,7 @@ fn main() -> Result<(), Error> {
 
     event_loop.run(move |event, _, control_flow| {
         if let Event::RedrawRequested(_) = event {
-            world.draw_painter(pixels.frame_mut());
+            world.draw(pixels.frame_mut());
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;

@@ -106,7 +106,7 @@ mod tests {
     #[test]
     fn visible_faces() {
         // Create a cube
-        let bottom_face = CubicFace3::from_line(
+        let bottom_face = CubicFace3::hface_from_line(
             Vector3::newi(0, 0, 0),
             Vector3::newi(1, 0, 0),
             Box::new(ColoredTexture::new(Color::purple())),
@@ -150,7 +150,7 @@ mod tests {
     /// This test was created to solve a bug with side views of some cubes
     #[test]
     fn test_side_faces_with_rotated_camera() {
-        let bottom_face = CubicFace3::from_line(
+        let bottom_face = CubicFace3::hface_from_line(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
             Box::new(ColoredTexture::new(Color::purple())),
@@ -171,7 +171,7 @@ mod tests {
 
     #[test]
     fn test_painter_algorithm_problem_side() {
-        let bottom_face = CubicFace3::from_line(
+        let bottom_face = CubicFace3::hface_from_line(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
             Box::new(ColoredTexture::new(Color::yellow())),

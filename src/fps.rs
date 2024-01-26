@@ -26,7 +26,7 @@ impl FPSMonitor {
     }
 
     pub fn log_fps(&mut self) {
-        if self.frame_count == 20 {
+        if self.frame_count > 20 {
             let mean_elapsed: f32 = self.frames.iter().sum::<f32>() / self.frames.len() as f32;
             let mean_fps = 1. / mean_elapsed;
             self.frame_count = 0;

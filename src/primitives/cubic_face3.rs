@@ -2,9 +2,12 @@ use std::cmp::min;
 use std::fmt::{Debug, Formatter};
 
 use crate::primitives::camera::Camera;
+use crate::primitives::color::Color;
 use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
+use crate::primitives::textures::bw::BWTexture;
+use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
@@ -26,8 +29,21 @@ impl Debug for CubicFace3 {
 }
 
 impl CubicFace3 {
-    /// Creates an horizontal cubic face by extruding a 2D line
-    pub fn from_line(p1: Vector3, p2: Vector3, texture: Box<dyn Texture>) -> Self {
+    /// Creates an vertical face above the line between p1 and p2.
+    pub fn vface_from_line(p1: Vector3, p2: Vector3) -> Self {
+        let v = p2 - p1;
+        let rotated = Vector3::new(0., 0., 2.0);
+        let p3 = p2 + rotated;
+        let p4 = p1 + rotated;
+        Self {
+            points: [p1, p2, p3, p4],
+            normal: v.clockwise(),
+            texture: Box::new(ColoredTexture::new(Color::yellow())),
+        }
+    }
+
+    /// Creates an horizontal face from an line, creating a square
+    pub fn hface_from_line(p1: Vector3, p2: Vector3, texture: Box<dyn Texture>) -> Self {
         let v = p2 - p1;
         let rotated = v.anticlockwise();
         let p3 = p2 + rotated;
