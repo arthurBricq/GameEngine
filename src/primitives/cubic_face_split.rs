@@ -13,7 +13,28 @@ use crate::primitives::vector::Vector3;
 /// * From the book "Graphics Gems 3", the chapter:
 /// "PARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEX"
 ///
-pub fn spit_in_front_and_behind(to_be_splitted: &CubicFace3, face: &CubicFace3) -> (Option<CubicFace3>, Option<CubicFace3>) {
+pub fn spit_in_front_and_behind(to_split: &CubicFace3, face: &CubicFace3) -> (Option<CubicFace3>, Option<CubicFace3>) {
+    // The algo is very simple : since the polygon are convex and have 4 points, we can diffenriate 3 scenarios
+    // * 1: all the points of `to_split` are in front of `face`
+    // * 2: all the points of `to_split` are behind `face`
+    // * 3: two points are behind, two points are front
+
+    // Note that this algorithm is a super-simplified version of polygon splitting algorithm,
+    // which works in my case.
+
+    // Compute the number of points in front of the face
+    let in_front = to_split.points().iter().filter(|p| point_in_front_of(&face, &p)).count();
+
+    match in_front {
+        0 => {
+            // all points behind
+            return (None, Some(*face.clone()))
+        },
+        2 => {},
+        4 => {},
+        _ => {panic!("Unsupported number of points in front of the face: {in_front}")}
+    }
+
     return (None, None);
 }
 
@@ -22,7 +43,6 @@ fn point_in_front_of(face: &CubicFace3, point: &Vector3) -> bool {
     let to_center = point.line_to(&face.center());
     to_center.dot(face.normal()) > 0.0
 }
-
 
 
 #[cfg(test)]
@@ -106,5 +126,7 @@ mod tests {
     }
 
     #[test]
-    fn bsp_polygon_splitting() {}
+    fn bsp_polygon_splitting() {
+
+    }
 }

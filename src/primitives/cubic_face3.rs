@@ -6,15 +6,16 @@ use crate::primitives::color::Color;
 use crate::primitives::cubic_face2::{CubicFace2, ProjectionCoordinates};
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
-use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
 /// A cubic face is an oriented square in space
+#[derive(Clone)]
 pub struct CubicFace3 {
     points: [Vector3; 4],
     normal: Vector3,
+    /// https://stackoverflow.com/a/30353928/13219173
     texture: Box<dyn Texture>,
 }
 

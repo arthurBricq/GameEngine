@@ -4,7 +4,7 @@ pub mod colored;
 use crate::primitives::color::Color;
 
 /// A texture is an interface that defines how to be rendered on the screen
-pub trait Texture {
+pub trait Texture : Clone {
     fn width(&self) -> f32;
     fn height(&self) -> f32;
     /// Returns the color at the provided pixel coordinates, where
