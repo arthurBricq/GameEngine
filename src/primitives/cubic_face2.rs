@@ -24,6 +24,9 @@ pub struct ProjectionCoordinates {
 }
 
 impl ProjectionCoordinates {
+}
+
+impl ProjectionCoordinates {
     pub fn new(alpha: f32, beta: f32) -> Self {
         Self { alpha, beta }
     }
@@ -43,6 +46,10 @@ impl ProjectionCoordinates {
     }
     pub fn beta(&self) -> f32 {
         self.beta
+    }
+
+    pub fn is_inside_face(&self) -> bool {
+        self.alpha >= 0. && self.alpha <= 1. && self.beta >= 0. && self.beta <= 1.
     }
 }
 
@@ -151,7 +158,11 @@ impl<'a> CubicFace2<'a> {
             // * c is in the referential of the world
             let direction = camera.ray_direction(u, v);
             let c = *camera.pose().position();
-            return face.line_projection(&c, &direction);
+            if let Some(proj) = face.line_projection(&c, &direction) {
+                if proj.1.is_inside_face() {
+                    return Some(proj);
+                }
+            }
         };
         None
     }

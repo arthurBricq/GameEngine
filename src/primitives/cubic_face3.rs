@@ -165,6 +165,11 @@ impl CubicFace3 {
 
     /// Computes the intersection between a line and self.
     ///
+    /// The computed intersection is not necessarily contained in the face. If you want to validate
+    /// that it is contained within the face, you can check `ProjectionCoordinates::is_inside_face`.
+    /// This mean that the projection can be outside the polygon boundaries, but it will always
+    /// be inside the polygon's plane.
+    ///
     /// The line is defined by:
     /// * a starting point 'c' (stands for camera, in the use-case of raytracing)
     /// * a direction vector 'v'
@@ -182,7 +187,6 @@ impl CubicFace3 {
         //
         // To solve this equation, we use a matrix system that we
         // invert.
-        let points = self.points();
         let (a, b, p) = self.get_projective_base();
         let mat = Matrix3::new(
             a.x(),
@@ -201,8 +205,7 @@ impl CubicFace3 {
             let alpha = solution.x();
             let beta = solution.y();
             let t = solution.z();
-            if t >= 0. && alpha >= 0. && alpha <= 1. && beta >= 0. && beta <= 1. {
-                // This means the intersection is on the plane
+            if t >= 0. {
                 return Some((
                     (t * direction.norm() * 1000.) as u32,
                     ProjectionCoordinates::new(alpha, beta),
@@ -213,12 +216,15 @@ impl CubicFace3 {
         return None;
     }
 
-    /// Returns the intersection between the line from p1 to p2 and self
+    /// Returns the intersection between the line from p1 to p2 and self.
+    /// The function returns an intersection only if it contained in between p1 and p2.
     pub fn line_intersection(&self, p1: &Vector3, p2: &Vector3) -> Option<Vector3> {
         let dir = p1.line_to(p2);
         if let Some((dist, projection)) = self.line_projection(p1, &dir) {
             let (a, b, _p) = self.get_projective_base();
-            return Some(a * projection.alpha() + b * projection.beta());
+            if dist <= (dir.norm() * 1000.) as u32 {
+                return Some(a * projection.alpha() + b * projection.beta());
+            }
         }
         return None
     }

@@ -59,11 +59,50 @@ mod tests {
     }
 
     #[test]
+    ///                    G          H
+    ///
+    ///                          A
+    ///                          │
+    ///                          │
+    ///                          │
+    ///          y         C     │    D
+    ///                          │
+    ///                          │
+    ///                          │
+    ///                          B
+    ///
+    ///                    E           F
     fn test_line_intersection_with_place() {
-        let f = CubicFace3::vface_from_line(Vector3::newi(0,0,0), Vector3::newi(1,0,0));
-        let tmp = f.line_intersection(&Vector3::new(0.5, -1.0, 0.0), &Vector3::new(0.5, 1.0, 0.0));
-        assert!(tmp.is_some());
-        assert_eq!(tmp.unwrap(), Vector3::new(0.5, 0.0, 0.0));
+        let a = Vector3::newi(0,0,0);
+        let b = Vector3::newi(1,0,0);
+        let c = Vector3::new(0.5, -1.0, 0.0);
+        let d = Vector3::new(0.5, 1.0, 0.0);
+        let e = Vector3::new(1.5, -1.0, 0.0);
+        let f = Vector3::new(1.5, 1.0, 0.0);
+        let g = Vector3::new(-0.5, -1.0, 0.0);
+        let h = Vector3::new(-0.5, 1.0, 0.0);
+
+        let face = CubicFace3::vface_from_line(a, b);
+
+        assert_eq!(face.line_intersection(&c, &d), Some( Vector3::new(0.5, 0.0, 0.0)));
+        assert_eq!(face.line_intersection(&e, &f), Some( Vector3::new(1.5, 0.0, 0.0)));
+        assert_eq!(face.line_intersection(&f, &e), Some( Vector3::new(1.5, 0.0, 0.0)));
+        assert_eq!(face.line_intersection(&g, &h), Some( Vector3::new(-0.5, 0.0, 0.0)));
+
+        // Some diagonal intersection
+        assert_eq!(face.line_intersection(&e, &h), Some( Vector3::new(0.5, 0.0, 0.0)));
+        assert_eq!(face.line_intersection(&g, &f), Some( Vector3::new(0.5, 0.0, 0.0)));
+
+        // Some intersection not balanced around zero
+        let y = Vector3::new(0.5, -10.0, 0.0);
+        assert_eq!(face.line_intersection(&y, &d), Some( Vector3::new(0.5, 0.0, 0.0)));
+
+        // Some lines that do not intersect
+        assert_eq!(face.line_intersection(&y, &c), None);
+        assert_eq!(face.line_intersection(&c, &y), None);
+        assert_eq!(face.line_intersection(&c, &e), None);
+        assert_eq!(face.line_intersection(&c, &g), None);
+        assert_eq!(face.line_intersection(&d, &f), None);
     }
 
     #[test]

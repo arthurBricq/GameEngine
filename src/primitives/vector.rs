@@ -177,7 +177,6 @@ impl Sub for &Vector3 {
     }
 }
 
-
 impl AddAssign for Vector3 {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
