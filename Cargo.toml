@@ -13,3 +13,6 @@ rand = "*"
 
 # This crate allows to have a dequeu with a fixed-size
 bounded-vec-deque = "0.1.1"
+
+# This crate allows to clone a trait object
+dyn-clone = "1.0.16"

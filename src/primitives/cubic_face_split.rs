@@ -28,7 +28,7 @@ pub fn spit_in_front_and_behind(to_split: &CubicFace3, face: &CubicFace3) -> (Op
     match in_front {
         0 => {
             // all points behind
-            return (None, Some(*face.clone()))
+            // return (None, Some(*face.clone()))
         },
         2 => {},
         4 => {},

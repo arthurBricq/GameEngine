@@ -1,6 +1,7 @@
 use crate::primitives::color::Color;
 use crate::primitives::textures::Texture;
 
+#[derive(Clone)]
 pub struct BWTexture {
     w: f32,
     h: f32,

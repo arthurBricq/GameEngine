@@ -2,6 +2,7 @@ use crate::primitives::color::Color;
 use crate::primitives::textures::Texture;
 
 /// A simple texture which onl displays 1 color
+#[derive(Clone)]
 pub struct ColoredTexture {
     color: Color,
 }
