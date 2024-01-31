@@ -13,7 +13,7 @@ use crate::primitives::vector::Vector3;
 /// * From the book "Graphics Gems 3", the chapter:
 /// "PARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEXARTITIONING A 3-D CONVEX"
 ///
-pub fn spit_in_front_and_behind(to_split: &CubicFace3, face: &CubicFace3) -> (Option<CubicFace3>, Option<CubicFace3>) {
+pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<CubicFace3>, Option<CubicFace3>) {
     // The algo is very simple : since the polygon are convex and have 4 points, we can diffenriate 3 scenarios
     // * 1: all the points of `to_split` are in front of `face`
     // * 2: all the points of `to_split` are behind `face`
@@ -49,9 +49,9 @@ pub fn spit_in_front_and_behind(to_split: &CubicFace3, face: &CubicFace3) -> (Op
             // let i2 = discontinuities[1];
             // assert!(i1 < i2);
 
-            // Find the discontinuities: the links where the points go from in front to behind
+            // Find the discontinuities: the links where the points go from in front of behind
             let (i1, i2) = match (in_fronts[0] == in_fronts[1], in_fronts[1] == in_fronts[2],
-                   in_fronts[2] == in_fronts[3], in_fronts[3] == in_fronts[4]) {
+                   in_fronts[2] == in_fronts[3], in_fronts[3] == in_fronts[0]) {
                 (true, true, _, _) => (0, 1),
                 (true, _, true, _) => (0, 2),
                 (true, _, _, true) => (0, 3),
@@ -61,19 +61,36 @@ pub fn spit_in_front_and_behind(to_split: &CubicFace3, face: &CubicFace3) -> (Op
                 _ => {panic!("not support pattern")}
             };
 
+            println!("Splitting edges: {i1}, {i2}");
+
+
             // For the two discontinuities, compute the intersection point
-            let p1 = face.line_intersection(&points[i1], &points[i1+1]).unwrap();
-            let p2 = face.line_intersection(&points[i2], &points[i2+1]).unwrap();
-            println!("intersection points: {p1:?} and {p2:?}");
+            let x = face.line_intersection(&points[i1], &points[i1+1]).unwrap();
+            let y = face.line_intersection(&points[i2], &points[if i2 < 3 {i2 + 1} else { 0 }]).unwrap();
+            println!("intersection points: {x:?} and {y:?}");
 
             // Create the resulting faces
+            // For now, I am not sure how to handle the case of triangles.
+            // Let's think about it later on.
             match (i1, i2) {
-                (1, 2) => {}
-                (2, 3) => {}
-                (1, 3) => {}
+                (0, 1) => panic!("triangle not supported"),
+                (0, 2) => {
+                    let f1 = CubicFace3::new([points[0], x, y, points[3]], to_split.normal().clone(), to_split.texture().clone());
+                    let f2 = CubicFace3::new([x, points[1], points[2], y], to_split.normal().clone(), to_split.texture().clone());
+                    return (Some(f1), Some(f2))
+                }
+                (0, 3) => panic!("triangle not supported"),
+                (1, 2) => panic!("triangle not supported"),
+                (1, 3) => {
+                    let f1 = CubicFace3::new([points[0], points[1], x, y], to_split.normal().clone(), to_split.texture().clone());
+                    let f2 = CubicFace3::new([y, x, points[2], points[3]], to_split.normal().clone(), to_split.texture().clone());
+                    return (Some(f1), Some(f2))
+                }
+                (2, 3) => panic!("triangle not supported"),
                 (_, _) => {panic!("Unsupported set of splitting lines: {i1} and {i2}")}
             }
         }
+
         // all the points are in front
         4 => return (Some(face.clone()), None),
         _ => { panic!("Unsupported number of points in front of the face: {n_in_front}") }
@@ -92,7 +109,7 @@ fn point_in_front_of(face: &CubicFace3, point: &Vector3) -> bool {
 #[cfg(test)]
 mod tests {
     use crate::primitives::cubic_face3::CubicFace3;
-    use crate::primitives::cubic_face_split::point_in_front_of;
+    use crate::primitives::cubic_face_split::{bsp_polygon_split, point_in_front_of};
     use crate::primitives::vector::Vector3;
 
     #[test]
@@ -145,7 +162,6 @@ mod tests {
         let f = Vector3::new(1.5, 1.0, 0.0);
         let g = Vector3::new(-0.5, -1.0, 0.0);
         let h = Vector3::new(-0.5, 1.0, 0.0);
-
         let face = CubicFace3::vface_from_line(a, b);
 
         assert_eq!(face.line_intersection(&c, &d), Some(Vector3::new(0.5, 0.0, 0.0)));
@@ -170,5 +186,29 @@ mod tests {
     }
 
     #[test]
-    fn bsp_polygon_splitting() {}
+    /// Test that the polygon splitting algorithm works
+    fn test_bsp_polygon_splitting() {
+        //                    G          H
+        //                          A
+        //                          │
+        //          y         C     │    D
+        //                          │
+        //                          B
+        //                    E          F
+        let a = Vector3::newi(0, 0, 0);
+        let b = Vector3::newi(1, 0, 0);
+        let c = Vector3::new(0.5, -1.0, 0.0);
+        let d = Vector3::new(0.5, 1.0, 0.0);
+        let e = Vector3::new(1.5, -1.0, 0.0);
+        let f = Vector3::new(1.5, 1.0, 0.0);
+        let g = Vector3::new(-0.5, -1.0, 0.0);
+        let h = Vector3::new(-0.5, 1.0, 0.0);
+
+        let face_ab = CubicFace3::vface_from_line(a, b);
+        let face_gh = CubicFace3::vface_from_line(g, h);
+
+        let result = bsp_polygon_split(&face_gh, &face_ab);
+        println!("result = {result:#?}")
+
+    }
 }
