@@ -35,60 +35,31 @@ pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<Cu
         2 => {
             // Compute the points in front
             let in_fronts: Vec<bool> = to_split.points().iter().map(|p| point_in_front_of(&face, &p)).collect();
-
-            // Find the discontinuities: the links where the points go from in front to behind
-            // let mut discontinuities = vec![0usize;2];
-            // let mut idx = 0;
-            // for i in 1..in_fronts.len() {
-            //     if in_fronts[i] != in_fronts[i-1] {
-            //         discontinuities[idx] = i;
-            //         idx += 1;
-            //     }
-            // }
-            // assert_eq!(idx, 2);
-            // let i1 = discontinuities[0];
-            // let i2 = discontinuities[1];
-            // assert!(i1 < i2);
-
-            // Find the discontinuities: the links where the points go from in front of behind
-            let (i1, i2) = match (in_fronts[0] == in_fronts[1], in_fronts[1] == in_fronts[2],
-                   in_fronts[2] == in_fronts[3], in_fronts[3] == in_fronts[0]) {
-                (true, true, false, false) => (0, 1),
-                (true, false, true, false) => (0, 2),
-                (true, false, false, true) => (0, 3),
-                (false, true, true, false) => (1, 2),
-                (false, true, false, true) => (1, 3),
-                (false, false, true, true) => (2, 3),
-                _ => {panic!("not support pattern")}
+            enum SplitMode { AfterFirst, AfterSecond }
+            let mut split_mode = if in_fronts[0] != in_fronts[1] {
+                SplitMode::AfterFirst
+            } else {
+                SplitMode::AfterSecond
             };
-            println!("Splitting edges: {i1}, {i2}");
 
-            // Create the resulting faces
-            // For now, I am not sure how to handle the case of triangles.
-            // Let's think about it later on.
-            match (i1, i2) {
-                (0, 1) => panic!("triangle not supported"),
-                (0, 2) => {
+            match split_mode {
+                SplitMode::AfterFirst => {
                     let x = face.line_intersection(&points[0], &points[1]).unwrap();
                     let y = face.line_intersection(&points[2], &points[3]).unwrap();
                     let f1 = CubicFace3::new([points[0], x, y, points[3]], to_split.normal().clone(), to_split.texture().clone());
                     let f2 = CubicFace3::new([x, points[1], points[2], y], to_split.normal().clone(), to_split.texture().clone());
                     return (Some(f1), Some(f2))
                 }
-                (0, 3) => panic!("triangle not supported"),
-                (1, 2) => panic!("triangle not supported"),
-                (1, 3) => {
+                SplitMode::AfterSecond => {
                     let x = face.line_intersection(&points[1], &points[2]).unwrap();
                     let y = face.line_intersection(&points[3], &points[0]).unwrap();
                     let f1 = CubicFace3::new([points[0], points[1], x, y], to_split.normal().clone(), to_split.texture().clone());
                     let f2 = CubicFace3::new([y, x, points[2], points[3]], to_split.normal().clone(), to_split.texture().clone());
                     return (Some(f1), Some(f2))
+
                 }
-                (2, 3) => panic!("triangle not supported"),
-                (_, _) => {panic!("Unsupported set of splitting lines: {i1} and {i2}")}
             }
         }
-
         // all the points are in front
         4 => return (Some(face.clone()), None),
         _ => { panic!("Unsupported number of points in front of the face: {n_in_front}") }
@@ -144,14 +115,14 @@ mod tests {
     ///                          │
     ///                          │
     ///                          │
-    ///          y         C     │    D
+    ///          P         C     │    D
     ///                          │
     ///                          │
     ///                          │
     ///                          B
     ///
     ///                    E           F
-    fn test_line_intersection_with_place() {
+    fn test_line_intersection_with_plane() {
         let a = Vector3::newi(0, 0, 0);
         let b = Vector3::newi(1, 0, 0);
         let c = Vector3::new(0.5, -1.0, 0.0);
@@ -186,13 +157,11 @@ mod tests {
     #[test]
     /// Test that the polygon splitting algorithm works
     fn test_bsp_polygon_splitting() {
-        //                    G----------H
-        //                          A
-        //                          │
-        //          y         C     │    D
-        //                          │
-        //                          B
-        //                    E          F
+        //                    G----------H          x=-0.5
+        //                          A               x=0
+        //          P         C     │    D          x=0.5
+        //                          B               x=1
+        //                    E          F          y=1.5
         let a = Vector3::newi(0, 0, 0);
         let b = Vector3::newi(1, 0, 0);
         let c = Vector3::new(0.5, -1.0, 0.0);
@@ -201,12 +170,51 @@ mod tests {
         let f = Vector3::new(1.5, 1.0, 0.0);
         let g = Vector3::new(-0.5, -1.0, 0.0);
         let h = Vector3::new(-0.5, 1.0, 0.0);
+        let p = Vector3::new(0.5, -2.0, 0.0);
 
         let face_ab = CubicFace3::vface_from_line(a, b);
         let face_gh = CubicFace3::vface_from_line(g, h);
+        let face_gc = CubicFace3::vface_from_line(g, c);
+        let face_hf = CubicFace3::vface_from_line(h, f);
+        let face_cp = CubicFace3::vface_from_line(c, p);
 
-        let result = bsp_polygon_split(&face_gh, &face_ab);
-        println!("result = {result:#?}")
+        // The face GH must be split in two faces
+        let (r1, r2) = bsp_polygon_split(&face_gh, &face_ab);
+        assert!(r1.is_some());
+        assert!(r2.is_some());
+        let f1 = r1.unwrap();
+        let f2 = r2.unwrap();
+        assert!(f1.points().contains(&Vector3::new(-0.5, 0.0, 0.0)));
+        assert!(f1.points().contains(&Vector3::new(-0.5, 0.0, 2.0)));
+        assert!(f2.points().contains(&Vector3::new(-0.5, 0.0, 0.0)));
+        assert!(f2.points().contains(&Vector3::new(-0.5, 0.0, 2.0)));
+
+        // The gc face is behind
+        let (r1, r2) = bsp_polygon_split(&face_gc, &face_ab);
+        assert!(r1.is_none());
+        assert!(r2.is_some());
+
+        // Same for CP
+        let (r1, r2) = bsp_polygon_split(&face_cp, &face_ab);
+        assert!(r1.is_none());
+        assert!(r2.is_some());
+
+        // The gc face is in front
+        let (r1, r2) = bsp_polygon_split(&face_hf, &face_ab);
+        assert!(r1.is_some());
+        assert!(r2.is_none());
+
+        // between h and e, there should be an intersection
+        let face_eh = CubicFace3::vface_from_line(e, h);
+        let (r1, r2) = bsp_polygon_split(&face_eh, &face_ab);
+        assert!(r1.is_some());
+        assert!(r2.is_some());
+        let f1 = r1.unwrap();
+        let f2 = r2.unwrap();
+        assert!(f1.points().contains(&Vector3::new(0.5, 0.0, 0.0)));
+        assert!(f1.points().contains(&Vector3::new(0.5, 0.0, 2.0)));
+        assert!(f2.points().contains(&Vector3::new(0.5, 0.0, 0.0)));
+        assert!(f2.points().contains(&Vector3::new(0.5, 0.0, 2.0)));
 
     }
 }

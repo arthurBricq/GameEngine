@@ -217,7 +217,7 @@ impl CubicFace3 {
         return None;
     }
 
-    /// Returns the intersection between the line from p1 to p2 and self.
+    /// Returns the intersection between the line from p1 to p2 and the plane defined by self (but not limited to!)
     /// The function returns an intersection only if it contained in between p1 and p2.
     pub fn line_intersection(&self, p1: &Vector3, p2: &Vector3) -> Option<Vector3> {
         let dir = p1.line_to(p2);

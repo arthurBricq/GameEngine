@@ -21,10 +21,10 @@ The game engine is too slow when there are few hundreds of polygon. Let's implem
 - BSP (binary space partioning)
   - [x] Implements the **painter algorithm** instead of **raytracing**.
   - [ ] Textures with painter algorithm
-  - [ ] Implements a method to split a polygon to be either in front or behind another 
+  - [x] Implements a method to split a polygon to be either in front or behind another 
     - [x] is a point in front of a plane ?
-    - [ ] Intersection between a line and a plane
-    - [ ] Polygon splitting
+    - [x] Intersection between a line and a plane
+    - [x] Polygon splitting
   - [ ] Implements BSP nodes 
   - [ ] Implements BSP algorithm when rendering with the painter algorithm
 
