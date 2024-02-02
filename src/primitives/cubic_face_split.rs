@@ -18,6 +18,7 @@ pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<Cu
     // * 1: all the points of `to_split` are in front of `face`
     // * 2: all the points of `to_split` are behind `face`
     // * 3: two points are behind, two points are front
+    //   For this configuration, we only support two modes: horizontal split or vertical split.
 
     // Note that this algorithm is a super-simplified version of polygon splitting algorithm,
     // which works in my case.
@@ -52,22 +53,15 @@ pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<Cu
             // Find the discontinuities: the links where the points go from in front of behind
             let (i1, i2) = match (in_fronts[0] == in_fronts[1], in_fronts[1] == in_fronts[2],
                    in_fronts[2] == in_fronts[3], in_fronts[3] == in_fronts[0]) {
-                (true, true, _, _) => (0, 1),
-                (true, _, true, _) => (0, 2),
-                (true, _, _, true) => (0, 3),
-                (_, true, true, _) => (1, 2),
-                (_, true, _, true) => (1, 3),
-                (_, _, true, true) => (2, 3),
+                (true, true, false, false) => (0, 1),
+                (true, false, true, false) => (0, 2),
+                (true, false, false, true) => (0, 3),
+                (false, true, true, false) => (1, 2),
+                (false, true, false, true) => (1, 3),
+                (false, false, true, true) => (2, 3),
                 _ => {panic!("not support pattern")}
             };
-
             println!("Splitting edges: {i1}, {i2}");
-
-
-            // For the two discontinuities, compute the intersection point
-            let x = face.line_intersection(&points[i1], &points[i1+1]).unwrap();
-            let y = face.line_intersection(&points[i2], &points[if i2 < 3 {i2 + 1} else { 0 }]).unwrap();
-            println!("intersection points: {x:?} and {y:?}");
 
             // Create the resulting faces
             // For now, I am not sure how to handle the case of triangles.
@@ -75,6 +69,8 @@ pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<Cu
             match (i1, i2) {
                 (0, 1) => panic!("triangle not supported"),
                 (0, 2) => {
+                    let x = face.line_intersection(&points[0], &points[1]).unwrap();
+                    let y = face.line_intersection(&points[2], &points[3]).unwrap();
                     let f1 = CubicFace3::new([points[0], x, y, points[3]], to_split.normal().clone(), to_split.texture().clone());
                     let f2 = CubicFace3::new([x, points[1], points[2], y], to_split.normal().clone(), to_split.texture().clone());
                     return (Some(f1), Some(f2))
@@ -82,6 +78,8 @@ pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<Cu
                 (0, 3) => panic!("triangle not supported"),
                 (1, 2) => panic!("triangle not supported"),
                 (1, 3) => {
+                    let x = face.line_intersection(&points[1], &points[2]).unwrap();
+                    let y = face.line_intersection(&points[3], &points[0]).unwrap();
                     let f1 = CubicFace3::new([points[0], points[1], x, y], to_split.normal().clone(), to_split.texture().clone());
                     let f2 = CubicFace3::new([y, x, points[2], points[3]], to_split.normal().clone(), to_split.texture().clone());
                     return (Some(f1), Some(f2))
@@ -188,7 +186,7 @@ mod tests {
     #[test]
     /// Test that the polygon splitting algorithm works
     fn test_bsp_polygon_splitting() {
-        //                    G          H
+        //                    G----------H
         //                          A
         //                          │
         //          y         C     │    D
