@@ -75,8 +75,8 @@ fn main() -> Result<(), Error> {
     for i in -n..n {
         for j in -n..n {
             let bottom_face = CubicFace3::hface_from_line(
-                Vector3::new(2.*i as f32, 2.*j as f32, 0.0),
-                Vector3::new(2.*i as f32 + 1.0, 2.*j as f32, 0.0),
+                Vector3::new(3.*i as f32, 3.*j as f32, 0.0),
+                Vector3::new(3.*i as f32 + 1.0, 3.*j as f32, 0.0),
                 Box::new(ColoredTexture::new(c.randomize_dimension(2))),
             );
             let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());

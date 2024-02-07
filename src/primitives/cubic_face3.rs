@@ -10,35 +10,48 @@ use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
-/// A cubic face is an oriented square in space
+/// A cubic face is an oriented rectangle in space.
+/// This class represents the basic geometric element of the engine.
+/// It is very important that all the points associated with such a face belong to
+/// the same hyper-plane, otherwise the renderer will not work.
 #[derive(Clone)]
 pub struct CubicFace3 {
     points: [Vector3; 4],
     normal: Vector3,
+    /// TODO the texture should be a global static reference:
+    /// &'static Texture
+    /// It simply makes more sense !
     /// https://stackoverflow.com/a/30353928/13219173
     texture: Box<dyn Texture>,
 }
 
 impl Debug for CubicFace3 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        // write!(
+        //     f,
+        //     "points: {:?}, {:?}, {:?}, {:?} & normal = {:?}",
+        //     self.points[0], self.points[1], self.points[2], self.points[3], self.normal
+        // );
         write!(
             f,
-            "points: {:?}, {:?}, {:?}, {:?} & normal = {:?}",
-            self.points[0], self.points[1], self.points[2], self.points[3], self.normal
+            "center = : {:?} & normal = {:?}",
+            self.center(), self.normal
         )
     }
 }
 
 impl CubicFace3 {
-    /// Creates an vertical face above the line between p1 and p2.
+    /// Creates a vertical face above the line between p1 and p2.
     pub fn vface_from_line(p1: Vector3, p2: Vector3) -> Self {
         let v = p2 - p1;
+        let mut normal = v.clockwise();
+        normal.normalize();
         let rotated = Vector3::new(0., 0., 2.0);
         let p3 = p2 + rotated;
         let p4 = p1 + rotated;
         Self {
             points: [p1, p2, p3, p4],
-            normal: v.clockwise(),
+            normal: normal,
             texture: Box::new(ColoredTexture::new(Color::yellow())),
         }
     }
@@ -111,8 +124,7 @@ impl CubicFace3 {
         let mat = Matrix3::z_rotation(by);
         // rotate each point of the face
         for i in 0..4 {
-            // TODO is there a way to use a reference of mat here ?
-            self.points[i] = mat.clone() * self.points[i];
+            self.points[i] = &mat * self.points[i];
         }
         // The normal vector also has to be rotated
         self.normal = mat.clone() * self.normal;
@@ -258,6 +270,10 @@ impl Object for CubicFace3 {
             // TODO maybe it's better to use an option ?
             Vec::new()
         }
+    }
+
+    fn get_all_faces(&self) -> Vec<&CubicFace3> {
+        vec![self]
     }
 
     fn rotate(&mut self, by: f32) {

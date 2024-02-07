@@ -13,8 +13,12 @@ The goal of this project is to
     - [x] user-control I
       - [x] acceleration
       - [x] rotation of the user
-    - [x] textures
-    - [ ] block motion at objects : obstacle detection
+    - [ ] textures
+      - [ ] with ray-tracing
+      - [ ] with painter algo
+      - [ ] extract encapsulation: use static variables instead.
+      - [ ] texture library ? Something like minecraft ?
+    - [ ] obstacle detection: block motion when hitting a face
 
 The game engine is too slow when there are few hundreds of polygon. Let's implement a binary space partioning algorithm to improve the performances.
 

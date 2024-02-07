@@ -6,7 +6,6 @@ use winit::window::Window;
 use crate::drawable::Drawable;
 use crate::motion_model::{MotionModel, DEFAULT_ACC};
 use crate::primitives::camera::Camera;
-use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face2::{CubicFace2, ProjectionCoordinates};
 use crate::primitives::cubic_face3::CubicFace3;
@@ -14,11 +13,13 @@ use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
 use crate::primitives::vector::Vector3;
 use crate::{HEIGHT, WIDTH};
+use crate::primitives::bsp::tree::*;
 
 /// Representation of the world in 3D coordinates
 /// A world simply contains several objects
 pub struct World {
     objects: Vec<Box<dyn Object>>,
+    bsp: Option<BSPNode>,
     camera: Camera,
     /// The motion model is the class responsible for smoothly updating the position
     motion_model: MotionModel,
@@ -32,6 +33,7 @@ impl World {
     pub fn new(camera: Camera) -> Self {
         Self {
             objects: Vec::new(),
+            bsp: None,
             camera,
             motion_model: MotionModel::new(),
             last_time: Instant::now(),
@@ -55,6 +57,18 @@ impl World {
         &self.camera
     }
 
+    /// Computes the Binary Space Partitioning  using the current objects.
+    /// This function will be removed when BSP is validated.
+    pub fn compute_bsp(&mut self) {
+        let mut faces = Vec::new();
+        for o in &self.objects {
+            for face in o.get_all_faces() {
+                faces.push(face.clone());
+            }
+        }
+        self.bsp = Some(binary_space_partionning(&faces))
+    }
+
     /// Debug function
     pub fn save_current_image(&self) {
         // TODO: look this up
@@ -64,30 +78,37 @@ impl World {
 
 impl Drawable for World {
     fn draw_painter(&self, frame: &mut [u8]) {
-        // Find the faces that are visible to the camera's perspective
-        let mut faces2: Vec<CubicFace2> = Vec::new();
-        for object in &self.objects {
-            let faces = object.get_visible_faces(&self.camera);
-            for face in faces {
-                let face2d = face.projection(&self.camera);
-                faces2.push(face2d);
+        if self.bsp.is_none() {
+            // Find the faces that are visible to the camera's perspective
+            let mut faces2: Vec<CubicFace2> = Vec::new();
+            for object in &self.objects {
+                let faces = object.get_visible_faces(&self.camera);
+                for face in faces {
+                    let face2d = face.projection(&self.camera);
+                    faces2.push(face2d);
+                }
             }
+
+            // Sort the faces by depth, from the farthest polygon to the closest polygon
+            // The sorting iis done over i32, because f32 does not implements Ord.
+            faces2.sort_by_key(|f| (f.distance_to(&self.camera) * 1000.) as i32);
+
+            // Draw the background color
+            let background = [214, 214, 194, 150];
+            for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+                let x = (i % WIDTH as usize) as i16;
+                let y = (i / WIDTH as usize) as i16;
+                pixel.copy_from_slice(&background);
+            }
+
+            // Paint the pixels, starting from the most distant ones
+            faces2.iter().rev().for_each(|f| f.draw(frame));
+        } else {
+            // The goal of having a BSP is to not sort the faces by depth
+
+
         }
 
-        // Sort the faces by depth, from the farthest polygon to the closest polygon
-        // The sorting iis done over i32, because f32 does not implements Ord.
-        faces2.sort_by_key(|f| (f.distance_to(&self.camera) * 1000.) as i32);
-
-        // Draw the background color
-        let background = [214, 214, 194, 150];
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let x = (i % WIDTH as usize) as i16;
-            let y = (i / WIDTH as usize) as i16;
-            pixel.copy_from_slice(&background);
-        }
-
-        // Paint the pixels, starting from the most distant ones
-        faces2.iter().rev().for_each(|f| f.draw(frame));
     }
 
     fn draw(&self, frame: &mut [u8]) {

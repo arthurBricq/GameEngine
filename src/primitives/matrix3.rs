@@ -26,6 +26,18 @@ impl Mul<Vector3> for Matrix3 {
     }
 }
 
+impl Mul<Vector3> for &Matrix3 {
+    type Output = Vector3;
+
+    fn mul(self, rhs: Vector3) -> Self::Output {
+        Vector3::new(
+            self.a11 * rhs.x() + self.a12 * rhs.y() + self.a13 * rhs.z(),
+            self.a21 * rhs.x() + self.a22 * rhs.y() + self.a23 * rhs.z(),
+            self.a31 * rhs.x() + self.a32 * rhs.y() + self.a33 * rhs.z(),
+        )
+    }
+}
+
 impl Mul<f32> for Matrix3 {
     type Output = Matrix3;
 

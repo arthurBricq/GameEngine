@@ -78,6 +78,14 @@ impl Object for Cube3 {
         to_return
     }
 
+    fn get_all_faces(&self) -> Vec<&CubicFace3> {
+        let mut to_return = Vec::new();
+        for face in &self.faces {
+            to_return.push(face);
+        }
+        to_return
+    }
+
     /// Rotate the rectangle by a provided angle
     fn rotate(&mut self, by: f32) {
         for face in &mut self.faces {
