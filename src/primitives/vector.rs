@@ -26,6 +26,14 @@ impl Vector3 {
         }
     }
 
+    pub fn newi2(x: i32, y: i32) -> Self {
+        Self {
+            x: x as f32,
+            y: y as f32,
+            z: 0.
+        }
+    }
+
     pub fn empty() -> Self {
         Self {
             x: 0.0,
@@ -76,6 +84,7 @@ mod tests {
         assert_eq!(v10.z, -1.0);
     }
 }
+
 /// Math operations
 
 impl Vector3 {

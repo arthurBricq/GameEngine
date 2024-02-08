@@ -78,7 +78,18 @@ impl World {
 
 impl Drawable for World {
     fn draw_painter(&self, frame: &mut [u8]) {
-        if self.bsp.is_none() {
+        // Draw the background color
+        let background = [214, 214, 194, 150];
+        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+            let x = (i % WIDTH as usize) as i16;
+            let y = (i / WIDTH as usize) as i16;
+            pixel.copy_from_slice(&background);
+        }
+
+        if let Some(tree) = &self.bsp {
+            // The tree is in charge of visiting itself and drawing in the proper order.
+            tree.painter_algorithm_traversal(&self.camera, frame);
+        } else {
             // Find the faces that are visible to the camera's perspective
             let mut faces2: Vec<CubicFace2> = Vec::new();
             for object in &self.objects {
@@ -93,20 +104,8 @@ impl Drawable for World {
             // The sorting iis done over i32, because f32 does not implements Ord.
             faces2.sort_by_key(|f| (f.distance_to(&self.camera) * 1000.) as i32);
 
-            // Draw the background color
-            let background = [214, 214, 194, 150];
-            for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-                let x = (i % WIDTH as usize) as i16;
-                let y = (i / WIDTH as usize) as i16;
-                pixel.copy_from_slice(&background);
-            }
-
             // Paint the pixels, starting from the most distant ones
             faces2.iter().rev().for_each(|f| f.draw(frame));
-        } else {
-            // The goal of having a BSP is to not sort the faces by depth
-
-
         }
 
     }

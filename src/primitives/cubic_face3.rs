@@ -56,7 +56,7 @@ impl CubicFace3 {
         }
     }
 
-    /// Creates an horizontal face from an line, creating a square
+    /// Creates a horizontal face from a line, creating a square
     pub fn hface_from_line(p1: Vector3, p2: Vector3, texture: Box<dyn Texture>) -> Self {
         let v = p2 - p1;
         let rotated = v.anticlockwise();

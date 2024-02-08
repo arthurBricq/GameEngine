@@ -58,12 +58,41 @@ impl BSPNode {
     fn behind(&self) -> &Option<Box<BSPNode>> {
         &self.behind
     }
+}
+
+
+
+/// Implementation of the rendering using the BSP
+impl BSPNode {
+    fn render(&self, camera: &Camera, frame: &mut [u8]) {
+        let face3d = self.get_plane();
+        if face3d.is_visible_from(&camera) {
+            let face2d = face3d.projection(camera);
+            face2d.draw(frame);
+        }
+    }
 
     pub fn painter_algorithm_traversal(&self, camera: &Camera, frame: &mut [u8]) {
+        println!("Drawing: {:?}", self.get_plane());
+        // TODO handle collinear faces
         if point_in_front_of(self.get_plane(), camera.pose().position()) {
             // draw in the following order: behind, current, in-fronts
+            if let Some(face) = &self.behind {
+                face.painter_algorithm_traversal(camera, frame);
+            }
+            self.render(camera, frame);
+            if let Some(face) = &self.in_front {
+                face.painter_algorithm_traversal(camera, frame);
+            }
         } else {
             // draw in the following order: in-fronts, current, behind
+            if let Some(face) = &self.in_front {
+                face.painter_algorithm_traversal(camera, frame);
+            }
+            self.render(camera, frame);
+            if let Some(face) = &self.behind {
+                face.painter_algorithm_traversal(camera, frame);
+            }
         }
     }
 }

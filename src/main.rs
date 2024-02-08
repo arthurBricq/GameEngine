@@ -14,6 +14,7 @@ use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::position::Pose;
+use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::vector::Vector3;
 use crate::worlds::World;
@@ -69,7 +70,6 @@ fn main() -> Result<(), Error> {
 
     // Create many cubes arranged as a sort of maze
     /*
-     */
     let c = Color::purple();
     let n = 4;
     for i in -n..n {
@@ -83,15 +83,16 @@ fn main() -> Result<(), Error> {
             world.add_cube(cube);
         }
     }
+     */
 
-    // let bottom_face = CubicFace3::from_line(
+    // let bottom_face = CubicFace3::hface_from_line(
     //     Vector3::new(0.0, 0.0, 0.0),
     //     Vector3::new(1.0, 0.0, 0.0),
     //     Box::new(ColoredTexture::new(Color::yellow())),
     // );
     // let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
     // world.add_cube(cube);
-    //
+
     // textured face
     // world.add_face(CubicFace3::create_simple_face(
     //     1.5,
@@ -102,15 +103,25 @@ fn main() -> Result<(), Error> {
     //     Box::new(BWTexture::new(0.5, 0.5)),
     // ));
 
+    world.add_face(CubicFace3::vface_from_line(Vector3::newi2(0, 0),
+                                               Vector3::newi2(1, 0)));
+
+    world.add_face(CubicFace3::vface_from_line(Vector3::newi2(1, -2),
+                                               Vector3::newi2(2, -2)));
+
     // Sets the camera as looking at the object
-    world.set_camera_position(Vector3::new(0.055, -0.562, 0.0));
+    world.set_camera_position(Vector3::newi2(0, -2));
 
     let mut fps_monitor = FPSMonitor::new();
     let mut use_fps_monitor = false;
 
+    // Calling this function will (i) build the BSP tree and (ii) force the renderer to use it
+    // when using the painter algorithm.
+    world.compute_bsp();
+
     event_loop.run(move |event, _, control_flow| {
         if let Event::RedrawRequested(_) = event {
-            world.draw(pixels.frame_mut());
+            world.draw_painter(pixels.frame_mut());
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;
