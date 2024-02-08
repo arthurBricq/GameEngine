@@ -5,8 +5,8 @@ pub mod tree;
 mod tests {
     use std::ops::Deref;
     use crate::primitives::cubic_face3::CubicFace3;
-    use crate::primitives::bsp::cubic_face_split::{bsp_polygon_split, point_in_front_of};
-    use crate::primitives::bsp::tree::binary_space_partionning;
+    use crate::bsp::cubic_face_split::{bsp_polygon_split, point_in_front_of};
+    use crate::bsp::tree::binary_space_partionning;
     use crate::primitives::vector::Vector3;
 
     pub(crate) fn get_map() -> (Vector3, Vector3, Vector3, Vector3, Vector3, Vector3, Vector3, Vector3, Vector3) {

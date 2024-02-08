@@ -1,5 +1,5 @@
 use std::ops::Deref;
-use crate::primitives::bsp::cubic_face_split::{bsp_polygon_split, point_in_front_of};
+use crate::bsp::cubic_face_split::{bsp_polygon_split, point_in_front_of};
 use crate::primitives::camera::Camera;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::vector::Vector3;
@@ -148,8 +148,8 @@ pub fn binary_space_partionning(faces: &Vec<CubicFace3>) -> BSPNode {
 
 #[cfg(test)]
 mod tests {
-    use crate::primitives::bsp::cubic_face_split::point_in_front_of;
-    use crate::primitives::bsp::tree::binary_space_partionning;
+    use crate::bsp::cubic_face_split::point_in_front_of;
+    use crate::bsp::tree::binary_space_partionning;
     use crate::primitives::cubic_face3::CubicFace3;
 
     #[test]
@@ -164,7 +164,7 @@ mod tests {
         //                          B               x=1
         //                    E          F          y=1.5
         //
-        let (a, b, c, d, e, f, g, h, p) = crate::primitives::bsp::tests::get_map();
+        let (a, b, c, d, e, f, g, h, p) = crate::bsp::tests::get_map();
 
         let face_ab = CubicFace3::vface_from_line(a, b);
         let face_gh = CubicFace3::vface_from_line(g, h);

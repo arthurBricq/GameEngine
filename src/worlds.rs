@@ -13,7 +13,7 @@ use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
 use crate::primitives::vector::Vector3;
 use crate::{HEIGHT, WIDTH};
-use crate::primitives::bsp::tree::*;
+use crate::bsp::tree::*;
 
 /// Representation of the world in 3D coordinates
 /// A world simply contains several objects
