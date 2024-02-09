@@ -138,7 +138,7 @@ impl Drawable for World {
             let mut best_face: Option<&CubicFace2> = None;
             for f2 in &faces2 {
                 if f2.contains(&Point2::new(x as f32, y as f32)) {
-                    if let Some(projection) = f2.raytracing(x, y, &self.camera) {
+                    if let Some(projection) = f2.raytracing(x, y) {
                         if projection.0 < min_distance {
                             min_distance = projection.0;
                             best_face = Some(f2);

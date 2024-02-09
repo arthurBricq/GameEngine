@@ -9,10 +9,11 @@ use crate::primitives::point::Point2;
 use crate::primitives::projective_coordinates::ProjectionCoordinates;
 use crate::primitives::textures::Texture;
 
-/// A cubic face is an oriented square in space.
+/// A CubicFace2 is the projection of a CubicFace3 (is an oriented square in space)
 ///
 /// Internal properties:
 /// * face: A 2D face can hold a reference to its referring 3D face.
+/// * the camera that observed this
 /// * norm_a or b: the length of the side of the face. This is helpful to keep it in the class
 ///   to avoid.
 ///
@@ -39,6 +40,7 @@ pub struct CubicFace2<'a> {
     face3: Option<&'a CubicFace3>,
     norm_a: f32,
     norm_b: f32,
+    camera: &'a Camera
 }
 
 impl<'a> Debug for CubicFace2<'a> {
@@ -52,7 +54,7 @@ impl<'a> Debug for CubicFace2<'a> {
 }
 
 impl<'a> CubicFace2<'a> {
-    pub fn new(points2d: [Point2; 4], face: &'a CubicFace3) -> Self {
+    pub fn new(points2d: [Point2; 4], face: &'a CubicFace3, camera: &'a Camera) -> Self {
         let points = face.points();
         let a = points[1] - points[0];
         let b = points[3] - points[0];
@@ -61,9 +63,11 @@ impl<'a> CubicFace2<'a> {
             face3: Some(face),
             norm_a: a.norm(),
             norm_b: b.norm(),
+            camera
         }
     }
 
+    /// Returns the color at the given projection
     pub fn color_at_projection(&self, coordinates: &ProjectionCoordinates) -> &Color {
         let (u, v) = coordinates.to_uv(self.norm_a, self.norm_b);
         &self.face3.unwrap().texture().color_at(u, v)
@@ -102,14 +106,12 @@ impl<'a> CubicFace2<'a> {
         &self,
         u: i16,
         v: i16,
-        camera: &Camera,
     ) -> Option<(u32, ProjectionCoordinates)> {
-
         if let Some(face) = self.face3 {
             // * v is in the referential of the camera frame
             // * c is in the referential of the world
-            let direction = camera.ray_direction(u, v);
-            let c = *camera.pose().position();
+            let direction = self.camera.ray_direction(u, v);
+            let c = self.camera.pose().position();
             if let Some(proj) = face.line_projection(&c, &direction) {
                 if proj.1.is_inside_face() {
                     return Some(proj);
@@ -157,10 +159,12 @@ impl<'a> CubicFace2<'a> {
         while y < ymax {
             while x < xmax {
                 if self.contains(&Point2::new(x as f32, y as f32)) {
-                    let i = pos_to_index(x, y);
-                    let pixel = &mut frame[i..i+4];
-                    let c = self.color_at_projection(&ProjectionCoordinates::new(0., 0.)).rgba();
-                    pixel.copy_from_slice(&c);
+                    if let Some((_, projection)) = self.raytracing(x as i16, y as i16) {
+                        let i = pos_to_index(x, y);
+                        let pixel = &mut frame[i..i+4];
+                        let c = self.color_at_projection(&projection).rgba();
+                        pixel.copy_from_slice(&c);
+                    }
                 }
                 x += 1;
             }
@@ -201,6 +205,7 @@ mod tests {
             face3: None,
             norm_a: 1.0,
             norm_b: 1.0,
+            camera: &Camera::default()
         };
 
         assert!(face2.contains(&Point2::new(0.5, 0.5)));
@@ -228,6 +233,7 @@ mod tests {
             face3: None,
             norm_a: 1.0,
             norm_b: 1.0,
+            camera: &Camera::default()
         };
         assert!(face2.contains(&Point2::new(161., 21.)));
     }
@@ -262,18 +268,18 @@ mod tests {
         let projection = face.projection(&camera);
         println!("Projection = {projection:?}");
 
-        let d1 = projection.raytracing(100, 100, &camera);
+        let d1 = projection.raytracing(100, 100);
         let d1 = d1.unwrap().0;
         assert_eq!(d1, 2000);
 
-        let d2 = projection.raytracing(110, 100, &camera).unwrap().0;
-        let d3 = projection.raytracing(90, 100, &camera).unwrap().0;
+        let d2 = projection.raytracing(110, 100).unwrap().0;
+        let d3 = projection.raytracing(90, 100).unwrap().0;
         assert_eq!(d2, d3);
         assert!(d2 > d1);
         assert!(d3 > d1);
 
-        let d4 = projection.raytracing(100, 110, &camera).unwrap().0;
-        let d5 = projection.raytracing(100, 90, &camera).unwrap().0;
+        let d4 = projection.raytracing(100, 110).unwrap().0;
+        let d5 = projection.raytracing(100, 90).unwrap().0;
         assert_eq!(d4, d5);
         assert!(d4 > d1);
         assert!(d5 > d1);

@@ -11,11 +11,15 @@ A 3D game engine, written from scratch (without OpenGL, Vulkan or anything else)
 
 **Where am I at?**
 
-All the mentionned features actually work quite well ! You can try them out with :
+All the mentioned features actually work quite well ! You can try them out with :
 
 ```terminal
 cargo run --release
 ```
+
+Here's a small example with a few hundreds polygon displayed.
+
+![](example1.gif)
 
 **Why ?**
 
@@ -45,7 +49,8 @@ Change the global constants `WIDTH` and `HEIGHT` in `main.rs`.
       - [x] rotation of the user
     - [ ] textures
       - [x] with ray-tracing
-      - [ ] with painter algo
+      - [x] with painter algo
+      - [ ] fix bug with texture hiding objects in front of
       - [ ] extract encapsulation: use static variables instead.
       - [ ] load from bitmap
       - [ ] texture library ? Something like minecraft ?

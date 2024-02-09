@@ -1,6 +1,6 @@
 use crate::primitives::vector::Vector3;
 
-const MAX_ACC: f32 = 50.;
+const MAX_ACC: f32 = 200.;
 const MIN_ACC: f32 = 10.;
 pub const DEFAULT_ACC: f32 = 100.;
 

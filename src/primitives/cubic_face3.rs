@@ -46,7 +46,7 @@ impl CubicFace3 {
         let v = p2 - p1;
         let mut normal = v.clockwise();
         normal.normalize();
-        let rotated = Vector3::new(0., 0., 2.0);
+        let rotated = Vector3::new(0., 0., 5.0);
         let p3 = p2 + rotated;
         let p4 = p1 + rotated;
         Self {
@@ -112,9 +112,9 @@ impl CubicFace3 {
         &self.texture
     }
 
-    pub fn projection(&self, camera: &Camera) -> CubicFace2 {
+    pub fn projection<'a>(&'a self, camera: &'a Camera) -> CubicFace2 {
         let points2 = self.points.map(|p| camera.project(&p));
-        CubicFace2::new(points2, self)
+        CubicFace2::new(points2, self, camera)
     }
 
     pub fn center(&self) -> Vector3 {

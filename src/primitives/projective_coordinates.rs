@@ -14,9 +14,6 @@ pub struct ProjectionCoordinates {
 }
 
 impl ProjectionCoordinates {
-}
-
-impl ProjectionCoordinates {
     pub fn new(alpha: f32, beta: f32) -> Self {
         Self { alpha, beta }
     }

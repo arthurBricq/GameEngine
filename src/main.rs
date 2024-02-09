@@ -13,6 +13,7 @@ use crate::fps::FPSMonitor;
 use crate::frame::Frame;
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
+use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::ColoredTexture;
@@ -68,19 +69,19 @@ fn main() -> Result<(), Error> {
     let mut world = World::new(Camera::default());
 
     // Create many cubes arranged as a sort of maze
-    // let c = Color::purple();
-    // let n = 6;
-    // for i in -n..n {
-    //     for j in -n..n {
-    //         let bottom_face = CubicFace3::hface_from_line(
-    //             Vector3::new(3.*i as f32, 3.*j as f32, 0.0),
-    //             Vector3::new(3.*i as f32 + 1.0, 3.*j as f32, 0.0),
-    //             Box::new(ColoredTexture::new(c.randomize_dimension(2))),
-    //         );
-    //         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
-    //         world.add_cube(cube);
-    //     }
-    // }
+    let c = Color::purple();
+    let n = 6;
+    for i in -n..n {
+        for j in -n..n {
+            let bottom_face = CubicFace3::hface_from_line(
+                Vector3::new(3.*i as f32, 3.*j as f32, 0.0),
+                Vector3::new(3.*i as f32 + 1.0, 3.*j as f32, 0.0),
+                Box::new(ColoredTexture::new(c.randomize_dimension(2))),
+            );
+            let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+            world.add_cube(cube);
+        }
+    }
 
     // ### Create a cube
     // let bottom_face = CubicFace3::hface_from_line(
@@ -92,27 +93,28 @@ fn main() -> Result<(), Error> {
     // world.add_cube(cube);
 
     // ### Create some faces
-    let mut f1 = CubicFace3::vface_from_line(Vector3::newi2(0, 0), Vector3::newi2(1, 0));
+    let mut f1 = CubicFace3::vface_from_line(Vector3::newi2(2, 20), Vector3::newi2(2, -10));
     let mut f2 = CubicFace3::vface_from_line(Vector3::newi2(2, 0), Vector3::newi2(3, 0));
     let mut f3 = CubicFace3::vface_from_line(Vector3::newi2(1, 1), Vector3::newi2(2, 1));
     f1.set_texture(Box::new(BWTexture::new(0.5, 0.5)));
     f2.set_texture(Box::new(ColoredTexture::new(Color::orange())));
     f3.set_texture(Box::new(ColoredTexture::new(Color::purple())));
-    world.add_face(f1);
-    world.add_face(f2);
-    world.add_face(f3);
+
+    // world.add_face(f1);
+    // world.add_face(f2);
+    // world.add_face(f3);
 
     // Sets the camera as looking at the object
     world.set_camera_position(Vector3::newi2(3, -4));
     world.set_camera_rotation(-PI / 2.);
 
     // Benchmarking the maze
-    // world.set_camera_position(Vector3::new(0.11243102, -23.725393, -6.0802684));
-    // world.set_camera_rotation(-PI / 2.);
+    world.set_camera_position(Vector3::new(0.11243102, -23.725393, -6.0802684));
+    world.set_camera_rotation(-PI / 2.);
 
     // Calling this function will (i) build the BSP tree and (ii) force the renderer to use it
     // when using the painter algorithm.
-    world.compute_bsp();
+    // world.compute_bsp();
 
     // Run the main loop
     let mut fps_monitor = FPSMonitor::new();
