@@ -50,6 +50,10 @@ impl Camera {
         self.pose.set_position(position);
     }
 
+    pub fn set_rotation(&mut self, rot: f32) {
+        self.pose.set_rotation(rot);
+    }
+
     pub fn translate(&mut self, by: &Vector3) {
         self.pose.translate(by);
     }

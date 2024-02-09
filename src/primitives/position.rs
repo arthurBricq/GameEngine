@@ -34,4 +34,8 @@ impl Pose {
     pub fn set_position(&mut self, pos: Vector3) {
         self.pos = pos;
     }
+
+    pub fn set_rotation(&mut self, rot: f32) {
+        self.rotz = rot;
+    }
 }

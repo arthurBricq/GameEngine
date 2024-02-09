@@ -1,3 +1,4 @@
+use std::f32::consts::PI;
 use std::time::Instant;
 
 use pixels::{Error, Pixels, SurfaceTexture};
@@ -107,11 +108,12 @@ fn main() -> Result<(), Error> {
     world.add_face(CubicFace3::vface_from_line(Vector3::newi2(0, 0),
                                                Vector3::newi2(1, 0)));
 
-    world.add_face(CubicFace3::vface_from_line(Vector3::newi2(1, -2),
-                                               Vector3::newi2(2, -2)));
+    world.add_face(CubicFace3::vface_from_line(Vector3::newi2(1, 1),
+                                               Vector3::newi2(2, 1)));
 
     // Sets the camera as looking at the object
-    world.set_camera_position(Vector3::newi2(0, -2));
+    world.set_camera_position(Vector3::newi2(3, -4));
+    world.set_camera_rotation(-PI / 2.);
 
     let mut fps_monitor = FPSMonitor::new();
     let mut use_fps_monitor = false;

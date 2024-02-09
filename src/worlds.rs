@@ -53,6 +53,10 @@ impl World {
         self.camera.set_position(position);
     }
 
+    pub fn set_camera_rotation(&mut self, rot: f32) {
+        self.camera.set_rotation(rot);
+    }
+
     pub fn camera(&self) -> &Camera {
         &self.camera
     }
