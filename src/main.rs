@@ -28,8 +28,10 @@ mod png_saver;
 pub mod bsp;
 mod frame;
 
-pub const WIDTH: u32 = 320;
-pub const HEIGHT: u32 = 240;
+// For different screen resolution: https://en.wikipedia.org/wiki/Display_resolution
+
+pub const WIDTH: u32 = 480;
+pub const HEIGHT: u32 = 320;
 
 fn main() -> Result<(), Error> {
     let event_loop = EventLoop::new();
