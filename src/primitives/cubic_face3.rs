@@ -56,6 +56,8 @@ impl CubicFace3 {
         }
     }
 
+
+
     /// Creates a horizontal face from a line, creating a square
     pub fn hface_from_line(p1: Vector3, p2: Vector3, texture: Box<dyn Texture>) -> Self {
         let v = p2 - p1;
@@ -240,6 +242,9 @@ impl CubicFace3 {
             }
         }
         return None
+    }
+    pub fn set_texture(&mut self, texture: Box<dyn Texture>) {
+        self.texture = texture;
     }
 }
 

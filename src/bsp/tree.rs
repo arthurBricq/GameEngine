@@ -76,7 +76,6 @@ impl BSPNode {
     }
 
     pub fn painter_algorithm_traversal(&self, camera: &Camera, drawer: &mut dyn AbstractFrame) {
-        println!("Drawing: {:?}", self.get_plane());
         // TODO handle collinear faces
         if point_in_front_of(self.get_plane(), camera.pose().position()) {
             // draw in the following order: behind, current, in-fronts
@@ -152,6 +151,7 @@ pub fn binary_space_partionning(faces: &Vec<CubicFace3>) -> BSPNode {
 #[cfg(test)]
 mod tests {
     use std::f32::consts::PI;
+    use std::time::Instant;
     use crate::bsp::cubic_face_split::point_in_front_of;
     use crate::bsp::tree::binary_space_partionning;
     use crate::frame::AbstractFrame;
@@ -160,7 +160,10 @@ mod tests {
     use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::vector::Vector3;
     use crate::drawable::Drawable;
+    use crate::primitives::color::Color;
+    use crate::primitives::cube::Cube3;
     use crate::primitives::point::Point2;
+    use crate::primitives::textures::colored::ColoredTexture;
     use crate::worlds::World;
 
     #[test]
@@ -220,7 +223,6 @@ mod tests {
 
     impl AbstractFrame for DummyFrame {
         fn draw_one_face(&mut self, face: &CubicFace2) {
-            println!("Drawing face: ${face:?}");
             self.faces.push(face.points());
         }
     }
@@ -276,5 +278,46 @@ mod tests {
         // Assert that an object is visible
         assert!(drawer.has_face(&f1_p));
         assert!(drawer.has_face(&f2_p));
+    }
+
+    #[test]
+    fn bsp_benchmarking_with_dummy() {
+        let mut world = World::new(Camera::default());
+        world.set_camera_position(Vector3::new(0.11243102, -30.725393, -8.0802684));
+        world.set_camera_rotation(-PI / 2.);
+
+        // Create many cubes arranged as a sort of maze
+        let c = Color::purple();
+        let n = 6;
+        for i in -n..n {
+            for j in -n..n {
+                let bottom_face = CubicFace3::hface_from_line(
+                    Vector3::new(3.*i as f32, 3.*j as f32, 0.0),
+                    Vector3::new(3.*i as f32 + 1.0, 3.*j as f32, 0.0),
+                    Box::new(ColoredTexture::new(c.randomize_dimension(2))),
+                );
+                let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+                world.add_cube(cube);
+            }
+        }
+        // First use standard painter algorithm
+        let t0 = Instant::now();
+        let mut drawer = DummyFrame::new();
+        world.draw_painter(&mut drawer);
+        let dt_without = t0.elapsed();
+        println!("NO-bsp duration = {:?}", dt_without);
+
+        // Activate BSP
+        world.compute_bsp();
+        println!("BSP length: {}", world.bsp().as_ref().unwrap().len());
+
+        // Record with BSP
+        let t0 = Instant::now();
+        let mut drawer = DummyFrame::new();
+        world.draw_painter(&mut drawer);
+        let dt_with = t0.elapsed();
+        println!("BSP duration = {:?}", dt_with);
+
+        assert!(dt_with < dt_without);
     }
 }
