@@ -1,58 +1,13 @@
 use std::cmp::{max, min};
 use std::fmt::{Debug, Formatter};
 
+use crate::{HEIGHT, WIDTH};
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
-use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
+use crate::primitives::projective_coordinates::ProjectionCoordinates;
 use crate::primitives::textures::Texture;
-use crate::{HEIGHT, WIDTH};
-
-/// Contains the projected coordinates (alpha, beta) such that a point P belonging to
-/// a parallelogram can be written as
-///
-/// P = alpha * a + beta * b + P0
-///
-/// where
-/// * P0 = first point of the parallelogram
-/// * a = vector from P0 to P1
-/// * b = vector from P0 to P3
-#[derive(PartialEq, Debug)]
-pub struct ProjectionCoordinates {
-    alpha: f32,
-    beta: f32,
-}
-
-impl ProjectionCoordinates {
-}
-
-impl ProjectionCoordinates {
-    pub fn new(alpha: f32, beta: f32) -> Self {
-        Self { alpha, beta }
-    }
-
-    pub fn none() -> Self {
-        Self {
-            alpha: 0.,
-            beta: 0.,
-        }
-    }
-
-    pub fn to_uv(&self, norm_a: f32, norm_b: f32) -> (f32, f32) {
-        (self.alpha * norm_a, self.beta * norm_b)
-    }
-    pub fn alpha(&self) -> f32 {
-        self.alpha
-    }
-    pub fn beta(&self) -> f32 {
-        self.beta
-    }
-
-    pub fn is_inside_face(&self) -> bool {
-        self.alpha >= 0. && self.alpha <= 1. && self.beta >= 0. && self.beta <= 1.
-    }
-}
 
 /// A cubic face is an oriented square in space.
 ///
@@ -108,8 +63,6 @@ impl<'a> CubicFace2<'a> {
             norm_b: b.norm(),
         }
     }
-
-
 
     pub fn color_at_projection(&self, coordinates: &ProjectionCoordinates) -> &Color {
         let (u, v) = coordinates.to_uv(self.norm_a, self.norm_b);

@@ -29,6 +29,12 @@ This seems to be one of my biggest personal project, I'd love to keep expanding 
 
 I would like to implement a small game, either a version of Doom, or a minimal version of Minecraft.
 
+# FAQ
+
+**How to change screen resolution?**
+
+Change the global constants `WIDTH` and `HEIGHT` in `main.rs`.
+
 # Personal TODO-list
 
 - game engine

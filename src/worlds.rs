@@ -1,20 +1,20 @@
 use std::time::Instant;
-use pixels::{Pixels, SurfaceTexture};
-use winit::event::VirtualKeyCode;
-use winit::window::Window;
 
+use winit::event::VirtualKeyCode;
+
+use crate::bsp::tree::*;
 use crate::drawable::Drawable;
-use crate::motion_model::{MotionModel, DEFAULT_ACC};
+use crate::frame::AbstractFrame;
+use crate::motion_model::{DEFAULT_ACC, MotionModel};
 use crate::primitives::camera::Camera;
 use crate::primitives::cube::Cube3;
-use crate::primitives::cubic_face2::{CubicFace2, ProjectionCoordinates};
+use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 use crate::primitives::point::Point2;
+use crate::primitives::projective_coordinates::ProjectionCoordinates;
 use crate::primitives::vector::Vector3;
-use crate::{HEIGHT, WIDTH};
-use crate::bsp::tree::*;
-use crate::frame::AbstractFrame;
+use crate::WIDTH;
 
 /// Representation of the world in 3D coordinates
 /// A world simply contains several objects

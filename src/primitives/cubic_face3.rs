@@ -1,11 +1,11 @@
-use std::cmp::min;
 use std::fmt::{Debug, Formatter};
 
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
-use crate::primitives::cubic_face2::{CubicFace2, ProjectionCoordinates};
+use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
+use crate::primitives::projective_coordinates::ProjectionCoordinates;
 use crate::primitives::textures::colored::ColoredTexture;
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
@@ -288,13 +288,14 @@ impl Object for CubicFace3 {
 
 #[cfg(test)]
 mod tests {
+    use std::f32::consts::PI;
+
     use crate::primitives::camera::Camera;
     use crate::primitives::color::Color;
-    use crate::primitives::cubic_face3::{distance_to_line, CubicFace3};
+    use crate::primitives::cubic_face3::{CubicFace3, distance_to_line};
     use crate::primitives::position::Pose;
     use crate::primitives::textures::colored::ColoredTexture;
     use crate::primitives::vector::Vector3;
-    use std::f32::consts::PI;
 
     #[test]
     fn visible_face_in_different_directions() {
