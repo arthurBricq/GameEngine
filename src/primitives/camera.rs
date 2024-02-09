@@ -23,6 +23,15 @@ impl Camera {
         }
     }
 
+    pub fn default() -> Self {
+        Self {
+            pose: Pose::new(Vector3::empty(), 0.),
+            f: 100.,
+            px: WIDTH as f32 / 2.,
+            py: HEIGHT as f32 / 2.
+        }
+    }
+
     /// Project the provided point (in world frame) into pixels
     pub fn project(&self, point: &Vector3) -> Point2 {
         // point is in frame references

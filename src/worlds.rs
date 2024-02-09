@@ -74,10 +74,16 @@ impl World {
         self.bsp = Some(binary_space_partionning(&faces))
     }
 
+
+
     /// Debug function
     pub fn save_current_image(&self) {
         // TODO: look this up
         // https://stackoverflow.com/a/38956995/13219173
+    }
+
+    pub fn bsp(&self) -> &Option<BSPNode> {
+        &self.bsp
     }
 }
 

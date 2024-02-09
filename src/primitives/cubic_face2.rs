@@ -108,6 +108,8 @@ impl<'a> CubicFace2<'a> {
         }
     }
 
+
+
     pub fn color_at_projection(&self, coordinates: &ProjectionCoordinates) -> &Color {
         let (u, v) = coordinates.to_uv(self.norm_a, self.norm_b);
         &self.face3.unwrap().texture().color_at(u, v)
@@ -184,6 +186,14 @@ impl<'a> CubicFace2<'a> {
                 pixel.copy_from_slice(&c);
             }
         }
+    }
+
+    // Returns true if the faces are roughly equals.
+    pub fn equals_to(&self, other: &CubicFace2) -> bool {
+        self.points == other.points
+    }
+    pub fn points(&self) -> [Point2; 4] {
+        self.points.clone()
     }
 }
 

@@ -40,9 +40,11 @@ impl BSPNode {
     pub fn debug(&self, indent: usize) {
         println!("{:indent$}Node from face: {:?}", "", self.faces[0], indent = indent);
         if let Some(node) = &self.in_front {
+            println!("{:indent$}(in front): ", "", indent = indent);
             node.deref().debug(indent + 2);
         }
         if let Some(node) = &self.behind {
+            println!("{:indent$}(behind): ", "", indent = indent);
             node.deref().debug(indent + 2);
         }
     }
@@ -56,16 +58,16 @@ impl BSPNode {
     fn in_front(&self) -> &Option<Box<BSPNode>> {
         &self.in_front
     }
+
     fn behind(&self) -> &Option<Box<BSPNode>> {
         &self.behind
     }
 }
 
 
-
 /// Implementation of the rendering using the BSP
 impl BSPNode {
-    fn render(&self, camera: &Camera,  drawer: &mut dyn AbstractFrame) {
+    fn render(&self, camera: &Camera, drawer: &mut dyn AbstractFrame) {
         let face3d = self.get_plane();
         if face3d.is_visible_from(&camera) {
             let face2d = face3d.projection(camera);
@@ -149,12 +151,20 @@ pub fn binary_space_partionning(faces: &Vec<CubicFace3>) -> BSPNode {
 
 #[cfg(test)]
 mod tests {
+    use std::f32::consts::PI;
     use crate::bsp::cubic_face_split::point_in_front_of;
     use crate::bsp::tree::binary_space_partionning;
+    use crate::frame::AbstractFrame;
+    use crate::primitives::camera::Camera;
+    use crate::primitives::cubic_face2::CubicFace2;
     use crate::primitives::cubic_face3::CubicFace3;
+    use crate::primitives::vector::Vector3;
+    use crate::drawable::Drawable;
+    use crate::primitives::point::Point2;
+    use crate::worlds::World;
 
     #[test]
-    fn test_bsp1() {
+    fn test_bsp_construction1() {
 
         //     x going down
         //     y going right: -1    0    1
@@ -187,5 +197,84 @@ mod tests {
         assert_eq!(5, bsp.len());
         assert_eq!(3, bsp.in_front().as_ref().unwrap().len());
         assert_eq!(1, bsp.behind().as_ref().unwrap().len());
+    }
+
+    struct DummyFrame {
+        faces: Vec<[Point2; 4]>,
+    }
+
+    impl DummyFrame {
+        pub fn new() -> Self {
+            Self { faces: vec![] }
+        }
+
+        pub fn has_face(&self, f: &CubicFace2) -> bool {
+            for face in &self.faces {
+                if f.points() == *face {
+                    return true;
+                }
+            }
+            false
+        }
+    }
+
+    impl AbstractFrame for DummyFrame {
+        fn draw_one_face(&mut self, face: &CubicFace2) {
+            println!("Drawing face: ${face:?}");
+            self.faces.push(face.points());
+        }
+    }
+
+    #[test]
+    fn test_bsp_rendering1() {
+        let mut world = World::new(Camera::default());
+        let f1 = CubicFace3::vface_from_line(Vector3::newi2(0, 0), Vector3::newi2(1, 0));
+        let f2 = CubicFace3::vface_from_line(Vector3::newi2(1, 1), Vector3::newi2(2, 1));
+        world.add_face(f1.clone());
+        world.add_face(f2.clone());
+
+        // Sets the camera as looking at the object
+        world.set_camera_position(Vector3::newi2(3, -4));
+        world.set_camera_rotation(-PI / 2.);
+        world.compute_bsp();
+
+        // Test using the dummy drawer
+        let mut drawer = DummyFrame::new();
+        world.draw_painter(&mut drawer);
+
+        // Compute the projection
+        let f1_p = f1.projection(world.camera());
+        let f2_p = f2.projection(world.camera());
+
+        // Assert that an object is visible
+        assert!(drawer.has_face(&f1_p));
+        assert!(drawer.has_face(&f2_p));
+    }
+
+    #[test]
+    fn test_bsp_rendering2() {
+        let mut world = World::new(Camera::default());
+        let f1 = CubicFace3::vface_from_line(Vector3::newi2(0, 0), Vector3::newi2(1, 0));
+        let f2 = CubicFace3::vface_from_line(Vector3::newi2(2, 0), Vector3::newi2(3, 0));
+        world.add_face(f1.clone());
+        world.add_face(f2.clone());
+
+        // Sets the camera as looking at the object
+        world.set_camera_position(Vector3::newi2(3, -4));
+        world.set_camera_rotation(-PI / 2.);
+        world.compute_bsp();
+        world.bsp().as_ref().unwrap().debug(0);
+
+        // Test using the dummy drawer
+        let mut drawer = DummyFrame::new();
+        world.draw_painter(&mut drawer);
+
+        // Compute the projection
+        let f1_p = f1.projection(world.camera());
+        let f2_p = f2.projection(world.camera());
+
+        // Assert that an object is visible
+        assert!(drawer.has_face(&f1_p));
+        assert!(drawer.has_face(&f2_p));
     }
 }

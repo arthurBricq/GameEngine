@@ -29,7 +29,7 @@ pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<Cu
 
     match n_in_front {
         // all points behind
-        0 => return (None, Some(face.clone())),
+        0 => return (None, Some(to_split.clone())),
         // two points are in front, two points are behind: we need to
         // split the polygon in two.
         2 => {
@@ -60,11 +60,9 @@ pub fn bsp_polygon_split(to_split: &CubicFace3, face: &CubicFace3) -> (Option<Cu
             }
         }
         // all the points are in front
-        4 => return (Some(face.clone()), None),
+        4 => return (Some(to_split.clone()), None),
         _ => { panic!("Unsupported number of points in front of the face: {n_in_front}") }
     }
-
-    return (None, None);
 }
 
 /// Returns true if the given point is in front of the plane, false otherwise.
