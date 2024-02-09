@@ -10,6 +10,7 @@ use winit_input_helper::WinitInputHelper;
 
 use crate::drawable::Drawable;
 use crate::fps::FPSMonitor;
+use crate::frame::Frame;
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cube::Cube3;
@@ -27,6 +28,7 @@ mod primitives;
 mod worlds;
 mod png_saver;
 pub mod bsp;
+mod frame;
 
 pub const WIDTH: u32 = 320;
 pub const HEIGHT: u32 = 240;
@@ -120,11 +122,20 @@ fn main() -> Result<(), Error> {
 
     // Calling this function will (i) build the BSP tree and (ii) force the renderer to use it
     // when using the painter algorithm.
-    world.compute_bsp();
+    // world.compute_bsp();
 
     event_loop.run(move |event, _, control_flow| {
         if let Event::RedrawRequested(_) = event {
-            world.draw_painter(pixels.frame_mut());
+            // Draw the background color
+            let background = [214, 214, 194, 150];
+            for (i, pixel) in pixels.frame_mut().chunks_exact_mut(4).enumerate() {
+                let x = (i % WIDTH as usize) as i16;
+                let y = (i / WIDTH as usize) as i16;
+                pixel.copy_from_slice(&background);
+            }
+
+            let mut current_frame = Frame::new(pixels.frame_mut());
+            world.draw_painter(&mut current_frame);
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;

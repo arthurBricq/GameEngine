@@ -1,5 +1,6 @@
 use std::ops::Deref;
 use crate::bsp::cubic_face_split::{bsp_polygon_split, point_in_front_of};
+use crate::frame::AbstractFrame;
 use crate::primitives::camera::Camera;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::vector::Vector3;
@@ -64,34 +65,34 @@ impl BSPNode {
 
 /// Implementation of the rendering using the BSP
 impl BSPNode {
-    fn render(&self, camera: &Camera, frame: &mut [u8]) {
+    fn render(&self, camera: &Camera,  drawer: &mut dyn AbstractFrame) {
         let face3d = self.get_plane();
         if face3d.is_visible_from(&camera) {
             let face2d = face3d.projection(camera);
-            face2d.draw(frame);
+            drawer.draw_one_face(&face2d);
         }
     }
 
-    pub fn painter_algorithm_traversal(&self, camera: &Camera, frame: &mut [u8]) {
+    pub fn painter_algorithm_traversal(&self, camera: &Camera, drawer: &mut dyn AbstractFrame) {
         println!("Drawing: {:?}", self.get_plane());
         // TODO handle collinear faces
         if point_in_front_of(self.get_plane(), camera.pose().position()) {
             // draw in the following order: behind, current, in-fronts
             if let Some(face) = &self.behind {
-                face.painter_algorithm_traversal(camera, frame);
+                face.painter_algorithm_traversal(camera, drawer);
             }
-            self.render(camera, frame);
+            self.render(camera, drawer);
             if let Some(face) = &self.in_front {
-                face.painter_algorithm_traversal(camera, frame);
+                face.painter_algorithm_traversal(camera, drawer);
             }
         } else {
             // draw in the following order: in-fronts, current, behind
             if let Some(face) = &self.in_front {
-                face.painter_algorithm_traversal(camera, frame);
+                face.painter_algorithm_traversal(camera, drawer);
             }
-            self.render(camera, frame);
+            self.render(camera, drawer);
             if let Some(face) = &self.behind {
-                face.painter_algorithm_traversal(camera, frame);
+                face.painter_algorithm_traversal(camera, drawer);
             }
         }
     }

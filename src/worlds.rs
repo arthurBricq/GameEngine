@@ -14,6 +14,7 @@ use crate::primitives::point::Point2;
 use crate::primitives::vector::Vector3;
 use crate::{HEIGHT, WIDTH};
 use crate::bsp::tree::*;
+use crate::frame::AbstractFrame;
 
 /// Representation of the world in 3D coordinates
 /// A world simply contains several objects
@@ -81,18 +82,10 @@ impl World {
 }
 
 impl Drawable for World {
-    fn draw_painter(&self, frame: &mut [u8]) {
-        // Draw the background color
-        let background = [214, 214, 194, 150];
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let x = (i % WIDTH as usize) as i16;
-            let y = (i / WIDTH as usize) as i16;
-            pixel.copy_from_slice(&background);
-        }
-
+    fn draw_painter(&self, drawer: &mut dyn AbstractFrame) {
         if let Some(tree) = &self.bsp {
             // The tree is in charge of visiting itself and drawing in the proper order.
-            tree.painter_algorithm_traversal(&self.camera, frame);
+            tree.painter_algorithm_traversal(&self.camera, drawer);
         } else {
             // Find the faces that are visible to the camera's perspective
             let mut faces2: Vec<CubicFace2> = Vec::new();
@@ -109,12 +102,12 @@ impl Drawable for World {
             faces2.sort_by_key(|f| (f.distance_to(&self.camera) * 1000.) as i32);
 
             // Paint the pixels, starting from the most distant ones
-            faces2.iter().rev().for_each(|f| f.draw(frame));
+            faces2.iter().rev().for_each(|f| drawer.draw_one_face(f));
         }
 
     }
 
-    fn draw(&self, frame: &mut [u8]) {
+    fn draw_raytracing(&self, frame: &mut [u8]) {
         // Find the faces that are visible to the camera's perspective
         let mut faces2: Vec<CubicFace2> = Vec::new();
         for object in &self.objects {

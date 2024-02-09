@@ -1,4 +1,5 @@
 use winit::event::VirtualKeyCode;
+use crate::frame::AbstractFrame;
 
 /// If an object is drawable, it can be rendered onto the screen
 pub trait Drawable {
@@ -6,10 +7,10 @@ pub trait Drawable {
     fn update(&mut self);
 
     /// Draw onto pixels
-    fn draw(&self, frame: &mut [u8]);
+    fn draw_raytracing(&self, frame: &mut [u8]);
 
     /// Draw using the painter' algorithm
-    fn draw_painter(&self, frame: &mut [u8]);
+    fn draw_painter(&self, drawer: &mut dyn AbstractFrame);
 
     /// Called when the left mouse button is pressed at a given position of the screen
     fn left_mouse_pressed(&mut self, x: i16, y: i16);
