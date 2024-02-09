@@ -3,10 +3,10 @@
 A 3D game engine, written from scratch (without OpenGL, Vulkan or anything else) in Rust. It features:
 * 3D to 2D projections: to represent a 3D world as a 2D buffer of pixels
 * Different rendering algorithm have been implementing: 
-  * Basic raytracing
-  * Painter algorithm
-  * Binary-Space-Partitioning with painter algorithm
-* Textures
+  * A basic **raytracing**: this was my first POC, it's slow (1000 polygons render at ~5 FPS)
+  * A more complex one: the **Painter algorithm** : 1000 polygons are rendered at 60 FPS ! 
+* In my quest of optimizing, I implemented a **Binary-Space-Partitioning** representation of the space.
+* **Textures** rendering are also implemented.
 * User motions in the 3D world
 
 **Where am I at?**
@@ -17,13 +17,15 @@ All the mentionned features actually work quite well ! You can try them out with
 cargo run --release
 ```
 
-However, when using hundreds of 3D polygons, the engine becomes slow. What is slow is the function to render pixels. I am working on making it faster.
-
 **Why ?**
 
-I wanted to learn more about computer graphics, and to keep progressing in Rust. This seems to be one of my biggest, I am already quite proud of where I am at.
+I wanted to learn more about **computer graphics**, algorithmic in general, in software architecture and to keep progressing in Rust. 
+
+As a matter of fact, writing your own game engine involes *a lot* of design questions, of algorithms implementation and of writing somewhat optimal code.
 
 **What is my goal ?**
+
+This seems to be one of my biggest personal project, I'd love to keep expanding it to an actual playable game.
 
 I would like to implement a small game, either a version of Doom, or a minimal version of Minecraft.
 

@@ -1,3 +1,4 @@
+use std::cmp::{max, min};
 use std::fmt::{Debug, Formatter};
 
 use crate::primitives::camera::Camera;
@@ -6,7 +7,7 @@ use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::point::Point2;
 use crate::primitives::textures::Texture;
-use crate::WIDTH;
+use crate::{HEIGHT, WIDTH};
 
 /// Contains the projected coordinates (alpha, beta) such that a point P belonging to
 /// a parallelogram can be written as
@@ -116,10 +117,6 @@ impl<'a> CubicFace2<'a> {
     }
 
     /// Returns true if the face contains the given point
-    ///
-    /// TODO I am sure this can be optimized. For instance, we could keep a set
-    ///      of all of the 2d pixels (it's a binary finite set) at creation of the
-    ///      face and then just lookup in this set.
     pub fn contains(&self, point: &Point2) -> bool {
         /// Returns true if the link between the points 'i' and 'j' has the `point` to
         /// its left.
@@ -173,18 +170,49 @@ impl<'a> CubicFace2<'a> {
         self.face3.unwrap().distance_to(cam)
     }
 
-    // Draws all of the pixels of self in the given frame
+    /// Returns a bounding box containing the box
+    /// format: xmin, ymin, xmax, ymax
+    fn bounding_box(&self) -> (u32, u32, u32, u32) {
+        let mut xmin = self.points[0].x() as u32;
+        let mut ymin = self.points[0].y() as u32;
+        let mut xmax = self.points[0].x() as u32;
+        let mut ymax = self.points[0].y() as u32;
+        for i in 1..self.points.len() {
+            let x = self.points[i].x() as u32;
+            let y = self.points[i].y() as u32;
+            xmin = min(x, xmin);
+            ymin = min(y, ymin);
+            xmax = max(x, xmax);
+            ymax = max(y, ymax);
+        }
+        ((xmin-2).clamp(0, WIDTH), (ymin-2).clamp(0, HEIGHT), (xmax+2).clamp(0, WIDTH), (ymax+2).clamp(0, HEIGHT))
+    }
+
+    /// Draws all the pixels of self in the given frame.
+    /// - TODO render proper color when working with textures
     pub fn draw(&self, frame: &mut [u8]) {
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let x = (i % WIDTH as usize) as i16;
-            let y = (i / WIDTH as usize) as i16;
-            if self.contains(&Point2::new(x as f32, y as f32)) {
-                // TODO: compute the correct projection
-                let c = self
-                    .color_at_projection(&ProjectionCoordinates::new(0., 0.))
-                    .rgba();
-                pixel.copy_from_slice(&c);
+        /// Given a 2D position (in pixels), returns the index inside the 1D buffer of pixels.
+        fn pos_to_index(x: u32, y: u32) -> usize {
+            4 * (x + y * WIDTH) as usize
+        }
+
+        let (xmin, ymin, xmax, ymax) = self.bounding_box();
+        let mut x = xmin;
+        let mut y = ymin;
+
+        // go through all the points in the bounding box
+        while y < ymax {
+            while x < xmax {
+                if self.contains(&Point2::new(x as f32, y as f32)) {
+                    let i = pos_to_index(x, y);
+                    let pixel = &mut frame[i..i+4];
+                    let c = self.color_at_projection(&ProjectionCoordinates::new(0., 0.)).rgba();
+                    pixel.copy_from_slice(&c);
+                }
+                x += 1;
             }
+            x = xmin;
+            y += 1;
         }
     }
 

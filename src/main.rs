@@ -120,14 +120,17 @@ fn main() -> Result<(), Error> {
         if let Event::RedrawRequested(_) = event {
             // Draw the background color
             let background = [214, 214, 194, 150];
-            for (i, pixel) in pixels.frame_mut().chunks_exact_mut(4).enumerate() {
-                let x = (i % WIDTH as usize) as i16;
-                let y = (i / WIDTH as usize) as i16;
+            for pixel in pixels.frame_mut().chunks_exact_mut(4) {
                 pixel.copy_from_slice(&background);
             }
 
+            // For using painter algorithm (with or without binary space partitioning)
             let mut current_frame = Frame::new(pixels.frame_mut());
             world.draw_painter(&mut current_frame);
+
+            // For using raytracing algorithn:
+            // world.draw_raytracing(pixels.frame_mut());
+
             if let Err(err) = pixels.render() {
                 log_error("pixels.render", err);
                 *control_flow = ControlFlow::Exit;
