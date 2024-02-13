@@ -3,7 +3,8 @@ use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 
-use crate::primitives::textures::colored::ColoredTexture;
+use crate::primitives::textures::colored::{BLACK, ColoredTexture};
+use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
 /// A cube in 3D coordinates.
@@ -15,7 +16,7 @@ pub struct Cube3 {
 
 impl Cube3 {
     /// Construct a cube from a bottom face with an extrusion above, strictly on the z-direction
-    pub fn from_face(bottom: CubicFace3, h: f32, c: Color) -> Self {
+    pub fn from_face(bottom: CubicFace3, h: f32, texture: &'static dyn Texture) -> Self {
         // Construct the 4 points of the upper face
         let points = bottom.points();
 
@@ -33,27 +34,27 @@ impl Cube3 {
         let top = CubicFace3::new(
             [p0, p1, p2, p3],
             n.opposite(),
-            Box::new(ColoredTexture::new(Color::black())),
+            &BLACK
         );
         let f01 = CubicFace3::new(
             [p0, p1, points[1], points[0]],
             p1 - p2,
-            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+            texture
         );
         let f12 = CubicFace3::new(
             [p1, p2, points[2], points[1]],
             p1 - p0,
-            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+            texture
         );
         let f23 = CubicFace3::new(
             [p2, p3, points[3], points[2]],
             p2 - p1,
-            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+            texture
         );
         let f30 = CubicFace3::new(
             [p3, p0, points[0], points[3]],
             p0 - p1,
-            Box::new(ColoredTexture::new(c.randomize_dimension(3))),
+            texture
         );
 
         Self {
@@ -117,7 +118,6 @@ mod tests {
         let bottom_face = CubicFace3::hface_from_line(
             Vector3::newi(0, 0, 0),
             Vector3::newi(1, 0, 0),
-            Box::new(ColoredTexture::new(Color::purple())),
         );
 
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
@@ -161,7 +161,6 @@ mod tests {
         let bottom_face = CubicFace3::hface_from_line(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
-            Box::new(ColoredTexture::new(Color::purple())),
         );
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
 
@@ -182,7 +181,6 @@ mod tests {
         let bottom_face = CubicFace3::hface_from_line(
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::new(1.0, 0.0, 0.0),
-            Box::new(ColoredTexture::new(Color::yellow())),
         );
         let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
 

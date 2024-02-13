@@ -6,7 +6,7 @@ use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
 use crate::primitives::projective_coordinates::ProjectionCoordinates;
-use crate::primitives::textures::colored::ColoredTexture;
+use crate::primitives::textures::colored::{ColoredTexture, YELLOW};
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
@@ -22,7 +22,7 @@ pub struct CubicFace3 {
     /// &'static Texture
     /// It simply makes more sense !
     /// https://stackoverflow.com/a/30353928/13219173
-    texture: Box<dyn Texture>,
+    texture: &'static dyn Texture,
 }
 
 impl Debug for CubicFace3 {
@@ -52,14 +52,12 @@ impl CubicFace3 {
         Self {
             points: [p1, p2, p3, p4],
             normal: normal,
-            texture: Box::new(ColoredTexture::new(Color::yellow())),
+            texture: &YELLOW
         }
     }
 
-
-
     /// Creates a horizontal face from a line, creating a square
-    pub fn hface_from_line(p1: Vector3, p2: Vector3, texture: Box<dyn Texture>) -> Self {
+    pub fn hface_from_line(p1: Vector3, p2: Vector3) -> Self {
         let v = p2 - p1;
         let rotated = v.anticlockwise();
         let p3 = p2 + rotated;
@@ -67,7 +65,7 @@ impl CubicFace3 {
         Self {
             points: [p1, p2, p3, p4],
             normal: Vector3::new(0.0, 0.0, -1.0),
-            texture,
+            texture: &YELLOW
         }
     }
 
@@ -78,7 +76,7 @@ impl CubicFace3 {
         z: f32,
         w: f32,
         h: f32,
-        texture: Box<dyn Texture>,
+        texture: &'static dyn Texture
     ) -> Self {
         CubicFace3::new(
             [
@@ -92,7 +90,7 @@ impl CubicFace3 {
         )
     }
 
-    pub fn new(points: [Vector3; 4], normal: Vector3, texture: Box<dyn Texture>) -> Self {
+    pub fn new(points: [Vector3; 4], normal: Vector3, texture: &'static dyn Texture) -> Self {
         Self {
             points,
             normal,
@@ -108,9 +106,7 @@ impl CubicFace3 {
         &self.normal
     }
 
-    pub fn texture(&self) -> &Box<dyn Texture> {
-        &self.texture
-    }
+
 
     pub fn projection<'a>(&'a self, camera: &'a Camera) -> CubicFace2 {
         let points2 = self.points.map(|p| camera.project(&p));
@@ -243,8 +239,12 @@ impl CubicFace3 {
         }
         return None
     }
-    pub fn set_texture(&mut self, texture: Box<dyn Texture>) {
+    pub fn set_texture(&mut self, texture: &'static dyn Texture) {
         self.texture = texture;
+    }
+
+    pub fn texture(&self) -> &'static dyn Texture {
+        self.texture
     }
 }
 
@@ -294,7 +294,7 @@ mod tests {
     use crate::primitives::color::Color;
     use crate::primitives::cubic_face3::{CubicFace3, distance_to_line};
     use crate::primitives::position::Pose;
-    use crate::primitives::textures::colored::ColoredTexture;
+    use crate::primitives::textures::colored::{ColoredTexture, PURPLE};
     use crate::primitives::vector::Vector3;
 
     #[test]
@@ -319,7 +319,7 @@ mod tests {
                 Vector3::new(x, y, z + 4.),
             ],
             Vector3::new(-1., 0., 0.),
-            Box::new(ColoredTexture::new(Color::dark_blue())),
+            PURPLE
         );
 
         // Initially the camera is looking in front
