@@ -31,7 +31,7 @@ impl Texture for ColoredTexture {
 
 
 // Define most basic textures as static variables
-pub static YELLOW: ColoredTexture = ColoredTexture::new(Color::black());
+pub static YELLOW: ColoredTexture = ColoredTexture::new(Color::yellow());
 pub static BLACK: ColoredTexture = ColoredTexture::new(Color::black());
 pub static PURPLE: ColoredTexture = ColoredTexture::new(Color::purple());
 pub static ORANGE: ColoredTexture = ColoredTexture::new(Color::orange());

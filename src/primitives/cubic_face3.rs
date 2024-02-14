@@ -46,7 +46,7 @@ impl CubicFace3 {
         let v = p2 - p1;
         let mut normal = v.clockwise();
         normal.normalize();
-        let rotated = Vector3::new(0., 0., 5.0);
+        let rotated = Vector3::new(0., 0., 2.0);
         let p3 = p2 + rotated;
         let p4 = p1 + rotated;
         Self {
