@@ -23,7 +23,7 @@ impl Color {
         }
     }
 
-    pub fn purple() -> Self {
+    pub const fn purple() -> Self {
         Self {
             r: 255,
             g: 0,
@@ -32,7 +32,7 @@ impl Color {
         }
     }
 
-    pub fn yellow() -> Self {
+    pub const fn yellow() -> Self {
         Self {
             r: 255,
             g: 255,
@@ -41,7 +41,7 @@ impl Color {
         }
     }
 
-    pub fn dark_blue() -> Self {
+    pub const fn dark_blue() -> Self {
         Self {
             r: 0,
             g: 0,
@@ -50,7 +50,7 @@ impl Color {
         }
     }
 
-    pub fn red() -> Self {
+    pub const fn red() -> Self {
         Self {
             r: 255,
             g: 51,
@@ -59,7 +59,7 @@ impl Color {
         }
     }
 
-    pub fn orange() -> Self {
+    pub const fn orange() -> Self {
         Self {
             r: 255,
             g: 153,
@@ -68,7 +68,7 @@ impl Color {
         }
     }
 
-    pub fn light_green() -> Self {
+    pub const fn light_green() -> Self {
         Self {
             r: 153,
             g: 255,
@@ -77,7 +77,7 @@ impl Color {
         }
     }
 
-    pub fn green() -> Self {
+    pub const fn green() -> Self {
         Self {
             r: 51,
             g: 255,
@@ -86,7 +86,7 @@ impl Color {
         }
     }
 
-    pub fn turquoise() -> Self {
+    pub const fn turquoise() -> Self {
         Self {
             r: 102,
             g: 255,
@@ -95,7 +95,7 @@ impl Color {
         }
     }
 
-    pub fn white() -> Self {
+    pub const fn white() -> Self {
         Self {
             r: 0,
             g: 0,
@@ -104,7 +104,7 @@ impl Color {
         }
     }
 
-    pub fn black() -> Self {
+    pub const fn black() -> Self {
         Self {
             r: 255,
             g: 255,

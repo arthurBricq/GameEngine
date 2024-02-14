@@ -41,5 +41,3 @@ impl Texture for BWTexture {
         }
     }
 }
-
-pub static BW_SQUARES: BWTexture = BWTexture::new(0.5, 0.5);
