@@ -1,5 +1,3 @@
-use std::sync::Mutex;
-use once_cell::sync::Lazy;
 use crate::primitives::color::Color;
 use crate::primitives::textures::Texture;
 
@@ -28,7 +26,6 @@ impl Texture for ColoredTexture {
         &self.color
     }
 }
-
 
 // Define most basic textures as static variables
 pub static YELLOW: ColoredTexture = ColoredTexture::new(Color::yellow());

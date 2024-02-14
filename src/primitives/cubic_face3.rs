@@ -1,7 +1,6 @@
 use std::fmt::{Debug, Formatter};
 
 use crate::primitives::camera::Camera;
-use crate::primitives::color::Color;
 use crate::primitives::cubic_face2::CubicFace2;
 use crate::primitives::matrix3::Matrix3;
 use crate::primitives::object::Object;
@@ -35,7 +34,8 @@ impl Debug for CubicFace3 {
         write!(
             f,
             "center = : {:?} & normal = {:?}",
-            self.center(), self.normal
+            self.center(),
+            self.normal
         )
     }
 }
@@ -52,7 +52,7 @@ impl CubicFace3 {
         Self {
             points: [p1, p2, p3, p4],
             normal: normal,
-            texture: &YELLOW
+            texture: &YELLOW,
         }
     }
 
@@ -65,7 +65,7 @@ impl CubicFace3 {
         Self {
             points: [p1, p2, p3, p4],
             normal: Vector3::new(0.0, 0.0, -1.0),
-            texture: &YELLOW
+            texture: &YELLOW,
         }
     }
 
@@ -76,7 +76,7 @@ impl CubicFace3 {
         z: f32,
         w: f32,
         h: f32,
-        texture: &'static dyn Texture
+        texture: &'static dyn Texture,
     ) -> Self {
         CubicFace3::new(
             [
@@ -105,8 +105,6 @@ impl CubicFace3 {
     pub fn normal(&self) -> &Vector3 {
         &self.normal
     }
-
-
 
     pub fn projection<'a>(&'a self, camera: &'a Camera) -> CubicFace2 {
         let points2 = self.points.map(|p| camera.project(&p));
@@ -185,7 +183,11 @@ impl CubicFace3 {
     /// * a starting point 'c' (stands for camera, in the use-case of raytracing)
     /// * a direction vector 'v'
     ///
-    pub fn line_projection(&self, c: &Vector3, direction: &Vector3) -> Option<(u32, ProjectionCoordinates)> {
+    pub fn line_projection(
+        &self,
+        c: &Vector3,
+        direction: &Vector3,
+    ) -> Option<(u32, ProjectionCoordinates)> {
         // Notation (*) means to be determined
         // C     = camera location
         // direction     = ray's direction
@@ -237,7 +239,7 @@ impl CubicFace3 {
                 return Some(a * projection.alpha() + b * projection.beta());
             }
         }
-        return None
+        return None;
     }
     pub fn set_texture(&mut self, texture: &'static dyn Texture) {
         self.texture = texture;
@@ -292,7 +294,7 @@ mod tests {
 
     use crate::primitives::camera::Camera;
     use crate::primitives::color::Color;
-    use crate::primitives::cubic_face3::{CubicFace3, distance_to_line};
+    use crate::primitives::cubic_face3::{distance_to_line, CubicFace3};
     use crate::primitives::position::Pose;
     use crate::primitives::textures::colored::{ColoredTexture, PURPLE};
     use crate::primitives::vector::Vector3;
@@ -319,7 +321,7 @@ mod tests {
                 Vector3::new(x, y, z + 4.),
             ],
             Vector3::new(-1., 0., 0.),
-            PURPLE
+            &PURPLE,
         );
 
         // Initially the camera is looking in front

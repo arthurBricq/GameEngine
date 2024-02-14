@@ -3,7 +3,7 @@ use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
 
-use crate::primitives::textures::colored::{BLACK, ColoredTexture};
+use crate::primitives::textures::colored::{ColoredTexture, BLACK};
 use crate::primitives::textures::Texture;
 use crate::primitives::vector::Vector3;
 
@@ -31,31 +31,11 @@ impl Cube3 {
         // Construct the missing faces
         let n = bottom.normal();
 
-        let top = CubicFace3::new(
-            [p0, p1, p2, p3],
-            n.opposite(),
-            &BLACK
-        );
-        let f01 = CubicFace3::new(
-            [p0, p1, points[1], points[0]],
-            p1 - p2,
-            texture
-        );
-        let f12 = CubicFace3::new(
-            [p1, p2, points[2], points[1]],
-            p1 - p0,
-            texture
-        );
-        let f23 = CubicFace3::new(
-            [p2, p3, points[3], points[2]],
-            p2 - p1,
-            texture
-        );
-        let f30 = CubicFace3::new(
-            [p3, p0, points[0], points[3]],
-            p0 - p1,
-            texture
-        );
+        let top = CubicFace3::new([p0, p1, p2, p3], n.opposite(), &BLACK);
+        let f01 = CubicFace3::new([p0, p1, points[1], points[0]], p1 - p2, texture);
+        let f12 = CubicFace3::new([p1, p2, points[2], points[1]], p1 - p0, texture);
+        let f23 = CubicFace3::new([p2, p3, points[3], points[2]], p2 - p1, texture);
+        let f30 = CubicFace3::new([p3, p0, points[0], points[3]], p0 - p1, texture);
 
         Self {
             faces: [bottom, top, f01, f12, f23, f30],
@@ -104,7 +84,7 @@ mod tests {
     use crate::primitives::object::Object;
     use crate::primitives::position::Pose;
     use crate::primitives::textures::bw::BWTexture;
-    use crate::primitives::textures::colored::ColoredTexture;
+    use crate::primitives::textures::colored::{ColoredTexture, YELLOW};
     use crate::primitives::vector::Vector3;
     use std::f32::consts::PI;
 
@@ -115,12 +95,10 @@ mod tests {
     #[test]
     fn visible_faces() {
         // Create a cube
-        let bottom_face = CubicFace3::hface_from_line(
-            Vector3::newi(0, 0, 0),
-            Vector3::newi(1, 0, 0),
-        );
+        let bottom_face =
+            CubicFace3::hface_from_line(Vector3::newi(0, 0, 0), Vector3::newi(1, 0, 0));
 
-        let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+        let cube = Cube3::from_face(bottom_face, 2.0, &YELLOW);
         let cube: Box<dyn Object> = Box::new(cube);
 
         // when looking in the wrong direction, no face should be seen
@@ -158,11 +136,9 @@ mod tests {
     /// This test was created to solve a bug with side views of some cubes
     #[test]
     fn test_side_faces_with_rotated_camera() {
-        let bottom_face = CubicFace3::hface_from_line(
-            Vector3::new(0.0, 0.0, 0.0),
-            Vector3::new(1.0, 0.0, 0.0),
-        );
-        let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+        let bottom_face =
+            CubicFace3::hface_from_line(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 0.0, 0.0));
+        let cube = Cube3::from_face(bottom_face, 2.0, &YELLOW);
 
         let camera = Camera::new(
             Pose::new(Vector3::new(-2.0, 2.5295, 0.0), 0.1963),
@@ -178,11 +154,9 @@ mod tests {
 
     #[test]
     fn test_painter_algorithm_problem_side() {
-        let bottom_face = CubicFace3::hface_from_line(
-            Vector3::new(0.0, 0.0, 0.0),
-            Vector3::new(1.0, 0.0, 0.0),
-        );
-        let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+        let bottom_face =
+            CubicFace3::hface_from_line(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 0.0, 0.0));
+        let cube = Cube3::from_face(bottom_face, 2.0, &YELLOW);
 
         let camera = Camera::new(
             Pose::new(Vector3::new(0.055, -0.562, 0.0), 0.0),
@@ -194,6 +168,4 @@ mod tests {
         let faces = cube.get_visible_faces(&camera);
         assert_eq!(1, faces.len());
     }
-
-
 }

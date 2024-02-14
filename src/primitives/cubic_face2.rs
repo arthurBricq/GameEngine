@@ -1,13 +1,13 @@
 use std::cmp::{max, min};
 use std::fmt::{Debug, Formatter};
 
-use crate::{HEIGHT, WIDTH};
 use crate::primitives::camera::Camera;
 use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::point::Point2;
 use crate::primitives::projective_coordinates::ProjectionCoordinates;
 use crate::primitives::textures::Texture;
+use crate::{HEIGHT, WIDTH};
 
 /// A CubicFace2 is the projection of a CubicFace3 (is an oriented square in space)
 ///
@@ -40,7 +40,7 @@ pub struct CubicFace2<'a> {
     face3: Option<&'a CubicFace3>,
     norm_a: f32,
     norm_b: f32,
-    camera: &'a Camera
+    camera: &'a Camera,
 }
 
 impl<'a> Debug for CubicFace2<'a> {
@@ -63,7 +63,7 @@ impl<'a> CubicFace2<'a> {
             face3: Some(face),
             norm_a: a.norm(),
             norm_b: b.norm(),
-            camera
+            camera,
         }
     }
 
@@ -102,11 +102,7 @@ impl<'a> CubicFace2<'a> {
     /// of the camera's screen, and the color of this pixel.
     ///
     /// Note: the distance is returned as u32 because f32 is not Orderable.
-    pub fn raytracing(
-        &self,
-        u: i16,
-        v: i16,
-    ) -> Option<(u32, ProjectionCoordinates)> {
+    pub fn raytracing(&self, u: i16, v: i16) -> Option<(u32, ProjectionCoordinates)> {
         if let Some(face) = self.face3 {
             // * v is in the referential of the camera frame
             // * c is in the referential of the world
@@ -140,7 +136,12 @@ impl<'a> CubicFace2<'a> {
             xmax = max(x, xmax);
             ymax = max(y, ymax);
         }
-        ((xmin-2).clamp(0, WIDTH), (ymin-2).clamp(0, HEIGHT), (xmax+2).clamp(0, WIDTH), (ymax+2).clamp(0, HEIGHT))
+        (
+            (xmin - 2).clamp(0, WIDTH),
+            (ymin - 2).clamp(0, HEIGHT),
+            (xmax + 2).clamp(0, WIDTH),
+            (ymax + 2).clamp(0, HEIGHT),
+        )
     }
 
     /// Draws all the pixels of self in the given frame.
@@ -161,7 +162,7 @@ impl<'a> CubicFace2<'a> {
                 if self.contains(&Point2::new(x as f32, y as f32)) {
                     if let Some((_, projection)) = self.raytracing(x as i16, y as i16) {
                         let i = pos_to_index(x, y);
-                        let pixel = &mut frame[i..i+4];
+                        let pixel = &mut frame[i..i + 4];
                         let c = self.color_at_projection(&projection).rgba();
                         pixel.copy_from_slice(&c);
                     }
@@ -190,7 +191,7 @@ mod tests {
     use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::point::Point2;
     use crate::primitives::position::Pose;
-    use crate::primitives::textures::colored::ColoredTexture;
+    use crate::primitives::textures::colored::{ColoredTexture, YELLOW};
     use crate::primitives::vector::Vector3;
 
     #[test]
@@ -205,7 +206,7 @@ mod tests {
             face3: None,
             norm_a: 1.0,
             norm_b: 1.0,
-            camera: &Camera::default()
+            camera: &Camera::default(),
         };
 
         assert!(face2.contains(&Point2::new(0.5, 0.5)));
@@ -233,7 +234,7 @@ mod tests {
             face3: None,
             norm_a: 1.0,
             norm_b: 1.0,
-            camera: &Camera::default()
+            camera: &Camera::default(),
         };
         assert!(face2.contains(&Point2::new(161., 21.)));
     }
@@ -261,7 +262,7 @@ mod tests {
                 Vector3::new(x, y, z + 4.),
             ],
             Vector3::new(-1., 0., 0.),
-            Box::new(ColoredTexture::new(Color::dark_blue())),
+            &YELLOW,
         );
 
         // Now let's get serious

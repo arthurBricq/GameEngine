@@ -8,7 +8,7 @@ pub mod matrix3;
 pub mod object;
 pub mod point;
 pub mod position;
+pub mod projective_coordinates;
 pub mod textures;
 pub mod transformation;
 pub mod vector;
-pub mod projective_coordinates;

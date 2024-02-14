@@ -12,23 +12,20 @@ use crate::drawable::Drawable;
 use crate::fps::FPSMonitor;
 use crate::frame::Frame;
 use crate::primitives::camera::Camera;
-use crate::primitives::color::Color;
-use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
-use crate::primitives::textures::Texture;
-use crate::primitives::textures::bw::{BWTexture};
+use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::{ColoredTexture, ORANGE, PURPLE, YELLOW};
 use crate::primitives::vector::Vector3;
 use crate::worlds::World;
 
+pub mod bsp;
 mod drawable;
 mod fps;
+mod frame;
 mod motion_model;
+mod png_saver;
 mod primitives;
 mod worlds;
-mod png_saver;
-pub mod bsp;
-mod frame;
 
 // For different screen resolution: https://en.wikipedia.org/wiki/Display_resolution
 
@@ -70,7 +67,6 @@ fn main() -> Result<(), Error> {
     let BW_TEXTURE = Box::leak(Box::new(BWTexture::new(0.5, 0.5)));
     // let bw = Box::leak(BW_TEXTURE);
     // let bw_texture: &'static dyn Texture = Box::
-
 
     // Create a world with a standard camera
     let mut world = World::new(Camera::default());

@@ -1,10 +1,8 @@
-use dyn_clone::DynClone;
-
 use crate::primitives::color::Color;
-use crate::primitives::textures::colored::ColoredTexture;
 
 pub mod bw;
 pub mod colored;
+pub mod pixelized;
 
 /// A texture is an interface that defines how to be rendered on the screen
 pub trait Texture {

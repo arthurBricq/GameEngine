@@ -1,9 +1,9 @@
-use std::ops::Deref;
 use crate::bsp::cubic_face_split::{bsp_polygon_split, point_in_front_of};
 use crate::frame::AbstractFrame;
 use crate::primitives::camera::Camera;
 use crate::primitives::cubic_face3::CubicFace3;
-use crate::primitives::vector::Vector3;
+
+use std::ops::Deref;
 
 /// Binary Space Partionning
 ///
@@ -20,7 +20,12 @@ pub struct BSPNode {
 
 impl BSPNode {
     fn new() -> Self {
-        Self { faces: Vec::new(), in_front: None, behind: None, to_process: Vec::new() }
+        Self {
+            faces: Vec::new(),
+            in_front: None,
+            behind: None,
+            to_process: Vec::new(),
+        }
     }
 
     fn add_face(&mut self, face: CubicFace3) {
@@ -38,7 +43,12 @@ impl BSPNode {
     // Public methods to visit the tree
 
     pub fn debug(&self, indent: usize) {
-        println!("{:indent$}Node from face: {:?}", "", self.faces[0], indent = indent);
+        println!(
+            "{:indent$}Node from face: {:?}",
+            "",
+            self.faces[0],
+            indent = indent
+        );
         if let Some(node) = &self.in_front {
             println!("{:indent$}(in front): ", "", indent = indent);
             node.deref().debug(indent + 2);
@@ -50,20 +60,29 @@ impl BSPNode {
     }
 
     /// Return the number of nodes starting from here
+    #[allow(dead_code)]
     fn len(&self) -> usize {
-        1 + if let Some(n) = &self.in_front { n.deref().len() } else { 0 } +
-            if let Some(n) = &self.behind { n.deref().len() } else { 0 }
+        1 + if let Some(n) = &self.in_front {
+            n.deref().len()
+        } else {
+            0
+        } + if let Some(n) = &self.behind {
+            n.deref().len()
+        } else {
+            0
+        }
     }
 
+    #[allow(dead_code)]
     fn in_front(&self) -> &Option<Box<BSPNode>> {
         &self.in_front
     }
 
+    #[allow(dead_code)]
     fn behind(&self) -> &Option<Box<BSPNode>> {
         &self.behind
     }
 }
-
 
 /// Implementation of the rendering using the BSP
 impl BSPNode {
@@ -122,7 +141,9 @@ pub fn binary_space_partionning(faces: &Vec<CubicFace3>) -> BSPNode {
                     in_fronts.push(in_front);
                     behinds.push(behind);
                 }
-                (_, _) => panic!("Not supported : the face necessarly belongs to the remaining space.")
+                (_, _) => {
+                    panic!("Not supported : the face necessarly belongs to the remaining space.")
+                }
             }
         }
 
@@ -150,25 +171,23 @@ pub fn binary_space_partionning(faces: &Vec<CubicFace3>) -> BSPNode {
 
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::PI;
-    use std::time::Instant;
     use crate::bsp::cubic_face_split::point_in_front_of;
     use crate::bsp::tree::binary_space_partionning;
+    use crate::drawable::Drawable;
     use crate::frame::AbstractFrame;
     use crate::primitives::camera::Camera;
+    use crate::primitives::cube::Cube3;
     use crate::primitives::cubic_face2::CubicFace2;
     use crate::primitives::cubic_face3::CubicFace3;
-    use crate::primitives::vector::Vector3;
-    use crate::drawable::Drawable;
-    use crate::primitives::color::Color;
-    use crate::primitives::cube::Cube3;
     use crate::primitives::point::Point2;
-    use crate::primitives::textures::colored::ColoredTexture;
+    use crate::primitives::textures::colored::YELLOW;
+    use crate::primitives::vector::Vector3;
     use crate::worlds::World;
+    use std::f32::consts::PI;
+    use std::time::Instant;
 
     #[test]
     fn test_bsp_construction1() {
-
         //     x going down
         //     y going right: -1    0    1
         //
@@ -178,7 +197,7 @@ mod tests {
         //                          B               x=1
         //                    E          F          y=1.5
         //
-        let (a, b, c, d, e, f, g, h, p) = crate::bsp::tests::get_map();
+        let (a, b, c, _d, e, _f, g, h, p) = crate::bsp::tests::get_map();
 
         let face_ab = CubicFace3::vface_from_line(a, b);
         let face_gh = CubicFace3::vface_from_line(g, h);
@@ -194,8 +213,12 @@ mod tests {
         assert_eq!(1, bsp.in_front().as_ref().unwrap().len());
         assert_eq!(1, bsp.behind().as_ref().unwrap().len());
 
-
-        let bsp = binary_space_partionning(&vec![face_ab.clone(), face_gh.clone(), face_cp.clone(), face_ce.clone()]);
+        let bsp = binary_space_partionning(&vec![
+            face_ab.clone(),
+            face_gh.clone(),
+            face_cp.clone(),
+            face_ce.clone(),
+        ]);
         // bsp.debug(0);
         assert_eq!(5, bsp.len());
         assert_eq!(3, bsp.in_front().as_ref().unwrap().len());
@@ -287,15 +310,14 @@ mod tests {
         world.set_camera_rotation(-PI / 2.);
 
         // Create many cubes arranged as a sort of maze
-        let c = Color::purple();
         let n = 6;
         for i in -n..n {
             for j in -n..n {
                 let bottom_face = CubicFace3::hface_from_line(
-                    Vector3::new(3.*i as f32, 3.*j as f32, 0.0),
-                    Vector3::new(3.*i as f32 + 1.0, 3.*j as f32, 0.0),
+                    Vector3::new(3. * i as f32, 3. * j as f32, 0.0),
+                    Vector3::new(3. * i as f32 + 1.0, 3. * j as f32, 0.0),
                 );
-                let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+                let cube = Cube3::from_face(bottom_face, 2.0, &YELLOW);
                 world.add_cube(cube);
             }
         }
