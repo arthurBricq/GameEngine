@@ -68,6 +68,7 @@ fn main() -> Result<(), Error> {
     let bw_texture = Box::leak(Box::new(BWTexture::new(0.5, 0.5)));
     let pixelated1 = Box::leak(Box::new(Pixelated::test1()));
     let pixelated2 = Box::leak(Box::new(Pixelated::test2()));
+    let soil_side = Box::leak(Box::new(Pixelated::soil_side()));
 
     // Create a world with a standard camera
     let mut world = World::new(Camera::default());
@@ -101,7 +102,7 @@ fn main() -> Result<(), Error> {
     let mut f3 = CubicFace3::vface_from_line(Vector3::newi2(1, 1), Vector3::newi2(2, 1));
     f1.set_texture(bw_texture);
     f2.set_texture(pixelated2);
-    f3.set_texture(pixelated1);
+    f3.set_texture(soil_side);
     // f3.set_texture(&PURPLE);
 
     world.add_face(f1);

@@ -20,10 +20,12 @@ impl Pixelated {
         colors.insert('y', Color::yellow());
         colors.insert('b', Color::dark_blue());
         colors.insert('k', Color::black());
-        colors.insert('w', Color::white());
+        colors.insert('0', Color::white());
         colors.insert('t', Color::turquoise());
         colors.insert('g', Color::green());
-        colors.insert('G', Color::light_green());
+        colors.insert('G', Color::dark_green());
+        colors.insert('w', Color::brown1());
+        colors.insert('W', Color::brown2());
         colors.insert('o', Color::orange());
         colors
     }
@@ -57,8 +59,8 @@ impl Texture for Pixelated {
 
     fn color_at(&self, u: f32, v: f32) -> &crate::primitives::color::Color {
         // Compute the coordinates inside the primitive square
-        let x = u % self.width();
-        let y = v % self.height();
+        let x = v % self.width();
+        let y = u % self.height();
         // Compute the index in the array of pixels
         let i = (x / self.pixel_size) as usize;
         let j = (y / self.pixel_size) as usize;
@@ -84,5 +86,20 @@ impl Pixelated {
             "obg".to_string()
         ];
         return Pixelated::new(lines, 0.15);
+    }
+
+    /// A minecraft-like side of soil
+    pub fn soil_side() -> Self {
+        let lines = vec![
+            "GGGGGGGGGG".to_string(),
+            "GggggggggG".to_string(),
+            "GggggggggG".to_string(),
+            "WWWWWWWWWW".to_string(),
+            "WwwwwwwwwW".to_string(),
+            "WwwwwwwwwW".to_string(),
+            "WwwwwwwwwW".to_string(),
+            "WWWWWWWWWW".to_string(),
+        ];
+        return Pixelated::new(lines, 0.1);
     }
 }

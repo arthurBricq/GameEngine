@@ -10,7 +10,7 @@ pub struct Color {
 }
 
 impl Color {
-    pub fn new(r: u8, g: u8, b: u8, a: u8) -> Self {
+    pub const fn new(r: u8, g: u8, b: u8, a: u8) -> Self {
         Self { r, g, b, a }
     }
 
@@ -77,14 +77,6 @@ impl Color {
         }
     }
 
-    pub const fn green() -> Self {
-        Self {
-            r: 51,
-            g: 255,
-            b: 51,
-            a: 255,
-        }
-    }
 
     pub const fn turquoise() -> Self {
         Self {
@@ -112,6 +104,27 @@ impl Color {
             a: 255,
         }
     }
+
+    pub const fn brown1() -> Self {
+        Self::new(106, 81, 47, 255)
+    }
+
+    pub const fn brown2() -> Self {
+        Self::new(100, 74, 44, 255)
+    }
+
+    pub const fn brown3() -> Self {
+        Self::new(90, 62, 34, 255)
+    }
+
+    pub const fn dark_green() -> Self {
+        Self::new(67, 95, 42, 255)
+    }
+
+    pub const fn green() -> Self {
+        Self::new(90, 123, 57, 255)
+    }
+
 
     // Randomize one of the axis of this color, between 0 and 255.
     // The axis are: 0=r, 1=g, 2=b, 3=a
