@@ -15,6 +15,7 @@ use crate::primitives::camera::Camera;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::{ColoredTexture, ORANGE, PURPLE, YELLOW};
+use crate::primitives::textures::pixelated::Pixelated;
 use crate::primitives::vector::Vector3;
 use crate::worlds::World;
 
@@ -64,9 +65,9 @@ fn main() -> Result<(), Error> {
     ];
 
     // Texture library is created in the main
-    let BW_TEXTURE = Box::leak(Box::new(BWTexture::new(0.5, 0.5)));
-    // let bw = Box::leak(BW_TEXTURE);
-    // let bw_texture: &'static dyn Texture = Box::
+    let bw_texture = Box::leak(Box::new(BWTexture::new(0.5, 0.5)));
+    let pixelated1 = Box::leak(Box::new(Pixelated::test1()));
+    let pixelated2 = Box::leak(Box::new(Pixelated::test2()));
 
     // Create a world with a standard camera
     let mut world = World::new(Camera::default());
@@ -98,9 +99,9 @@ fn main() -> Result<(), Error> {
     let mut f1 = CubicFace3::vface_from_line(Vector3::newi2(0, 0), Vector3::newi2(1, 0));
     let mut f2 = CubicFace3::vface_from_line(Vector3::newi2(2, 0), Vector3::newi2(3, 0));
     let mut f3 = CubicFace3::vface_from_line(Vector3::newi2(1, 1), Vector3::newi2(2, 1));
-    f1.set_texture(BW_TEXTURE);
-    f2.set_texture(&ORANGE);
-    f3.set_texture(BW_TEXTURE);
+    f1.set_texture(bw_texture);
+    f2.set_texture(pixelated2);
+    f3.set_texture(pixelated1);
     // f3.set_texture(&PURPLE);
 
     world.add_face(f1);

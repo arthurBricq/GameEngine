@@ -25,6 +25,7 @@ impl ProjectionCoordinates {
         }
     }
 
+    /// Returns coordinates in meters
     pub fn to_uv(&self, norm_a: f32, norm_b: f32) -> (f32, f32) {
         (self.alpha * norm_a, self.beta * norm_b)
     }

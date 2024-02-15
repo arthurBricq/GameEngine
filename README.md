@@ -21,6 +21,10 @@ Here's a small example with a few hundreds polygon displayed.
 
 ![](example1.gif)
 
+And here's an example of **texture rendering** 
+
+![](textures.png)
+
 **Why ?**
 
 I wanted to learn more about **computer graphics**, algorithmic in general, in software architecture and to keep progressing in Rust. 
@@ -51,12 +55,12 @@ Change the global constants `WIDTH` and `HEIGHT` in `main.rs`.
       - [x] with ray-tracing
       - [x] with painter algo
       - [ ] fix bug with texture hiding objects in front of
-      - [ ] extract encapsulation: use static variables instead.
-      - [ ] load from bitmap
+      - [x] extract encapsulation: use static variables instead.
+      - [x] load from bitmap
       - [ ] texture library ? Something like minecraft ?
     - [ ] obstacle detection: block motion when hitting a face
     - [x] Binary space partioning
-    - [ ] Slow pixel rendering
+    - [x] Slow pixel rendering
 
 ### BSP Todo-list
 
