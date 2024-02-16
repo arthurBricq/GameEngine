@@ -7,7 +7,7 @@ use crate::primitives::object::Object;
 use crate::primitives::projective_coordinates::ProjectionCoordinates;
 use crate::primitives::textures::colored::{ColoredTexture, YELLOW};
 use crate::primitives::textures::Texture;
-use crate::primitives::vector::Vector3;
+use crate::primitives::vector::{UNIT_X, UNIT_Y, UNIT_Z, Vector3};
 
 /// A cubic face is an oriented rectangle in space.
 /// This class represents the basic geometric element of the engine.
@@ -17,10 +17,6 @@ use crate::primitives::vector::Vector3;
 pub struct CubicFace3 {
     points: [Vector3; 4],
     normal: Vector3,
-    /// TODO the texture should be a global static reference:
-    /// &'static Texture
-    /// It simply makes more sense !
-    /// https://stackoverflow.com/a/30353928/13219173
     texture: &'static dyn Texture,
 }
 
@@ -69,25 +65,16 @@ impl CubicFace3 {
         }
     }
 
-    /// Creates a face pointing in the x direction
-    pub fn create_simple_face(
-        x: f32,
-        y: f32,
-        z: f32,
-        w: f32,
-        h: f32,
-        texture: &'static dyn Texture,
-    ) -> Self {
-        CubicFace3::new(
-            [
-                Vector3::new(x, y, z),
-                Vector3::new(x, y + w, z),
-                Vector3::new(x, y + w, z - h),
-                Vector3::new(x, y, z - h),
-            ],
-            Vector3::new(-1., 0., -0.),
-            texture,
-        )
+    pub fn minecraft_like(from: Vector3, side_tex: &'static dyn Texture) -> Self {
+        let b0 = from;
+        let b1 = from + UNIT_X;
+        let b2 = from + UNIT_Y;
+        let b3 = b2 + UNIT_X;
+        Self {
+            points: [b0, b1, b3, b2],
+            normal: Vector3::new(0.0, 0.0, -1.0),
+            texture: side_tex,
+        }
     }
 
     pub fn new(points: [Vector3; 4], normal: Vector3, texture: &'static dyn Texture) -> Self {
@@ -296,8 +283,8 @@ mod tests {
     use crate::primitives::color::Color;
     use crate::primitives::cubic_face3::{distance_to_line, CubicFace3};
     use crate::primitives::position::Pose;
-    use crate::primitives::textures::colored::{ColoredTexture, PURPLE};
-    use crate::primitives::vector::Vector3;
+    use crate::primitives::textures::colored::{ColoredTexture, PURPLE, YELLOW};
+    use crate::primitives::vector::{UNIT_X, UNIT_Y, UNIT_Z, Vector3};
 
     #[test]
     fn visible_face_in_different_directions() {
@@ -348,6 +335,32 @@ mod tests {
         assert!(face.is_visible_from(&camera));
         camera.apply_z_rot(-PI / 16.);
         assert!(face.is_visible_from(&camera));
+    }
+
+    #[test]
+    fn test_visible_horizontal_face() {
+        // Create an horizontal cubic face
+        let from = Vector3::empty();
+        let b0 = from;
+        let b1 = from + UNIT_X;
+        let b2 = from + UNIT_Y;
+        let b3 = b2 + UNIT_X;
+        let face = CubicFace3 {
+            points: [b0, b1, b2, b3],
+            normal: UNIT_Z,
+            texture: &YELLOW,
+        };
+
+        // Create a camera
+        let mut cam = Camera::default();
+        cam.set_position(Vector3::newi(2, 0, 2));
+        cam.set_rotation(PI);
+
+        println!("Face = {face:?}");
+        println!("Cam  = {:?}, {:?}", cam.pose().position(), cam.pose().orientation());
+
+        assert!(face.is_visible_from(&cam));
+
     }
 
     fn assert_near(v1: f32, v2: f32) {

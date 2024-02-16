@@ -12,11 +12,12 @@ use crate::drawable::Drawable;
 use crate::fps::FPSMonitor;
 use crate::frame::Frame;
 use crate::primitives::camera::Camera;
+use crate::primitives::cube::Cube3;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::textures::bw::BWTexture;
 use crate::primitives::textures::colored::{ColoredTexture, ORANGE, PURPLE, YELLOW};
 use crate::primitives::textures::pixelated::Pixelated;
-use crate::primitives::vector::Vector3;
+use crate::primitives::vector::{UNIT_Z, Vector3};
 use crate::worlds::World;
 
 pub mod bsp;
@@ -66,9 +67,13 @@ fn main() -> Result<(), Error> {
 
     // Texture library is created in the main
     let bw_texture = Box::leak(Box::new(BWTexture::new(0.5, 0.5)));
-    let pixelated1 = Box::leak(Box::new(Pixelated::test1()));
-    let pixelated2 = Box::leak(Box::new(Pixelated::test2()));
+
+    // Minecraft texture library
     let soil_side = Box::leak(Box::new(Pixelated::soil_side()));
+    let soil_top = Box::leak(Box::new(Pixelated::soil_top()));
+    let wood = Box::leak(Box::new(Pixelated::wood()));
+    let floor = Box::leak(Box::new(Pixelated::wood_floor()));
+    let stone = Box::leak(Box::new(Pixelated::stone()));
 
     // Create a world with a standard camera
     let mut world = World::new(Camera::default());
@@ -91,26 +96,43 @@ fn main() -> Result<(), Error> {
     // let bottom_face = CubicFace3::hface_from_line(
     //     Vector3::new(0.0, 0.0, 0.0),
     //     Vector3::new(1.0, 0.0, 0.0),
-    //     Box::new(ColoredTexture::new(Color::yellow())),
     // );
-    // let cube = Cube3::from_face(bottom_face, 2.0, Color::purple());
+    // let cube = Cube3::from_face(bottom_face, 2.0, soil_top);
     // world.add_cube(cube);
 
     // ### Create some faces
-    let mut f1 = CubicFace3::vface_from_line(Vector3::newi2(0, 0), Vector3::newi2(1, 0));
-    let mut f2 = CubicFace3::vface_from_line(Vector3::newi2(2, 0), Vector3::newi2(3, 0));
-    let mut f3 = CubicFace3::vface_from_line(Vector3::newi2(1, 1), Vector3::newi2(2, 1));
-    f1.set_texture(bw_texture);
-    f2.set_texture(pixelated2);
-    f3.set_texture(soil_side);
-    // f3.set_texture(&PURPLE);
+    // let mut f1 = CubicFace3::vface_from_line(Vector3::newi2(0, 0), Vector3::newi2(1, 0));
+    // let mut f2 = CubicFace3::vface_from_line(Vector3::newi2(2, 0), Vector3::newi2(3, 0));
+    // let mut f3 = CubicFace3::vface_from_line(Vector3::newi2(1, 1), Vector3::newi2(2, 1));
+    // f1.set_texture(bw_texture);
+    // f2.set_texture(pixelated2);
+    // f3.set_texture(soil_side);
+    // world.add_face(f1);
+    // world.add_face(f2);
+    // world.add_face(f3);
 
-    world.add_face(f1);
-    world.add_face(f2);
-    world.add_face(f3);
+    // Minecraft blocks
+    world.add_cube(Cube3::minecraft_like(Vector3::newi(0,0,0), soil_side, soil_top));
+    world.add_cube(Cube3::minecraft_like(Vector3::newi(1,0,0), soil_side, soil_top));
+    world.add_cube(Cube3::minecraft_like(Vector3::newi(2,0,0), soil_side, soil_top));
+    world.add_cube(Cube3::minecraft_like(Vector3::newi(3,0,0), soil_side, soil_top));
+    world.add_cube(Cube3::minecraft_like(Vector3::newi(0,-1,0), wood, wood));
+    world.add_cube(Cube3::minecraft_like(Vector3::newi(0,-3,0), stone, stone));
+    world.add_cube(Cube3::minecraft_like(Vector3::newi(1,-3,0), stone, stone));
+
+    // Set the floor
+    // let x0  = -5;
+    // let y0  = -5;
+    // let x1 = 5;
+    // let y1 = 5;
+    // world.add_face(CubicFace3::new(
+    //     [Vector3::newi(x0, y0, 1),Vector3::newi(x1, y0, 1),Vector3::newi(x1, y1, 1),Vector3::newi(x0, y1, 1)],
+    //     UNIT_Z.opposite(),
+    //     floor,
+    // ));
 
     // Sets the camera as looking at the object
-    world.set_camera_position(Vector3::newi2(3, -4));
+    world.set_camera_position(Vector3::new(2., -3., -1.5));
     world.set_camera_rotation(-PI / 2.);
 
     // Benchmarking the maze

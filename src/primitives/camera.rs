@@ -26,7 +26,7 @@ impl Camera {
     pub fn default() -> Self {
         Self {
             pose: Pose::new(Vector3::empty(), 0.),
-            f: 100.,
+            f: 200.,
             px: WIDTH as f32 / 2.,
             py: HEIGHT as f32 / 2.
         }

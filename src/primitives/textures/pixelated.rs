@@ -15,20 +15,6 @@ pub struct Pixelated {
 }
 
 impl Pixelated {
-    fn create_colors_library() -> HashMap<char, Color> {
-        let mut colors = HashMap::new();
-        colors.insert('y', Color::yellow());
-        colors.insert('b', Color::dark_blue());
-        colors.insert('k', Color::black());
-        colors.insert('0', Color::white());
-        colors.insert('t', Color::turquoise());
-        colors.insert('g', Color::green());
-        colors.insert('G', Color::dark_green());
-        colors.insert('w', Color::brown1());
-        colors.insert('W', Color::brown2());
-        colors.insert('o', Color::orange());
-        colors
-    }
 
     pub fn new(lines: Vec<String>, pixel_size: f32) -> Self {
         let rows = lines.len();
@@ -43,7 +29,7 @@ impl Pixelated {
             cols,
             pixel_size,
             pixels,
-            colors: Self::create_colors_library()
+            colors: Color::create_colors_library()
         }
     }
 }
@@ -71,22 +57,6 @@ impl Texture for Pixelated {
 
 
 impl Pixelated {
-    pub fn test1() -> Self {
-        let lines = vec![
-            "yyy".to_string(),
-            "bbb".to_string()
-        ];
-        return Pixelated::new(lines, 0.15);
-    }
-
-    pub fn test2() -> Self {
-        let lines = vec![
-            "gGo".to_string(),
-            "Gob".to_string(),
-            "obg".to_string()
-        ];
-        return Pixelated::new(lines, 0.15);
-    }
 
     /// A minecraft-like side of soil
     pub fn soil_side() -> Self {
@@ -98,7 +68,73 @@ impl Pixelated {
             "WwwwwwwwwW".to_string(),
             "WwwwwwwwwW".to_string(),
             "WwwwwwwwwW".to_string(),
+            "WwwwwwwwwW".to_string(),
+            "WwwwwwwwwW".to_string(),
             "WWWWWWWWWW".to_string(),
+        ];
+        return Pixelated::new(lines, 0.1);
+    }
+
+    pub fn soil_top() -> Self {
+        let lines = vec![
+            "GGGGGGGGGG".to_string(),
+            "GggggggggG".to_string(),
+            "GggGgggGgG".to_string(),
+            "GggggggggG".to_string(),
+            "GgGggggggG".to_string(),
+            "GggggGgggG".to_string(),
+            "GggGgggggG".to_string(),
+            "GggggggGgG".to_string(),
+            "GggggggggG".to_string(),
+            "GGGGGGGGGG".to_string(),
+        ];
+        return Pixelated::new(lines, 0.1);
+    }
+
+    pub fn wood() -> Self {
+        let lines = vec![
+            "1111111111".to_string(),
+            "1333333331".to_string(),
+            "1222222221".to_string(),
+            "1333333331".to_string(),
+            "1333333331".to_string(),
+            "1333333331".to_string(),
+            "1333333331".to_string(),
+            "1222222221".to_string(),
+            "1333333331".to_string(),
+            "1111111111".to_string(),
+        ];
+        return Pixelated::new(lines, 0.1);
+    }
+
+    pub fn wood_floor() -> Self {
+        let lines = vec![
+            "3333333333".to_string(),
+            "3333333333".to_string(),
+            "2222222222".to_string(),
+            "3333333333".to_string(),
+            "3333333333".to_string(),
+            "3333333333".to_string(),
+            "3333333333".to_string(),
+            "2222222222".to_string(),
+            "3333333333".to_string(),
+            "3333333333".to_string(),
+        ];
+        return Pixelated::new(lines, 0.3);
+    }
+
+    pub fn stone() -> Self {
+        let lines = vec![
+            "4444444444".to_string(),
+            "4656666664".to_string(),
+            "4666665664".to_string(),
+            "4665666664".to_string(),
+            "4666666664".to_string(),
+            "4665666664".to_string(),
+            "4666666564".to_string(),
+            "4656665664".to_string(),
+            "4666666664".to_string(),
+            "4444444444".to_string(),
         ];
         return Pixelated::new(lines, 0.1);
     }

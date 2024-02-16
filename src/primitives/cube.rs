@@ -1,11 +1,9 @@
 use crate::primitives::camera::Camera;
-use crate::primitives::color::Color;
 use crate::primitives::cubic_face3::CubicFace3;
 use crate::primitives::object::Object;
-
-use crate::primitives::textures::colored::{ColoredTexture, BLACK};
+use crate::primitives::textures::colored::BLACK;
 use crate::primitives::textures::Texture;
-use crate::primitives::vector::Vector3;
+use crate::primitives::vector::{UNIT_X, UNIT_Y, UNIT_Z, Vector3};
 
 /// A cube in 3D coordinates.
 /// The cube is defined by its faces. This is not the most lightweight representation of a cube,
@@ -41,6 +39,33 @@ impl Cube3 {
             faces: [bottom, top, f01, f12, f23, f30],
         }
     }
+
+    pub fn minecraft_like(from: Vector3, side_tex: &'static dyn Texture, top_tex: &'static dyn Texture) -> Self {
+        // Construct the points: b=bottom, t=top
+        let b0 = from;
+        let b1 = from + UNIT_X;
+        let b2 = from + UNIT_Y;
+        let b3 = b2 + UNIT_X;
+
+        let t0 = b0 + UNIT_Z;
+        let t1 = b1 + UNIT_Z;
+        let t2 = b2 + UNIT_Z;
+        let t3 = b3 + UNIT_Z;
+
+        // Construct the faces
+        let top = CubicFace3::new([t0, t1, t3, t2], UNIT_Z, top_tex);
+        let bottom = CubicFace3::new([b0, b1, b3, b2], UNIT_Z.opposite(), top_tex);
+        let f1 = CubicFace3::new([b0, b2, t2, t0], UNIT_X.opposite(), side_tex);
+        let f2 = CubicFace3::new([b2, b3, t3, t2], UNIT_Y, side_tex);
+        let f3 = CubicFace3::new([b3, b1, t1, t3], UNIT_X, side_tex);
+        let f4 = CubicFace3::new([b1, b0, t0, t1], UNIT_Y.opposite(), side_tex);
+
+        Self {
+            faces: [bottom, top, f1, f2, f3, f4]
+        }
+    }
+
+
 }
 
 impl Object for Cube3 {
@@ -77,16 +102,15 @@ impl Object for Cube3 {
 
 #[cfg(test)]
 mod tests {
+    use std::f32::consts::PI;
+
     use crate::primitives::camera::Camera;
-    use crate::primitives::color::Color;
     use crate::primitives::cube::Cube3;
     use crate::primitives::cubic_face3::CubicFace3;
     use crate::primitives::object::Object;
     use crate::primitives::position::Pose;
-    use crate::primitives::textures::bw::BWTexture;
-    use crate::primitives::textures::colored::{ColoredTexture, YELLOW};
+    use crate::primitives::textures::colored::YELLOW;
     use crate::primitives::vector::Vector3;
-    use std::f32::consts::PI;
 
     fn cam(x: f32, y: f32, theta_z: f32) -> Camera {
         Camera::new(Pose::new(Vector3::new(x, y, 0.0), theta_z), 100., 0.0, 0.0)
